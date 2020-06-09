@@ -10,7 +10,7 @@ class Sound extends React.Component{
 
 	render(){
 		return(
-			<button disabled={this.props.playing} onClick={this.props.playSound}>{this.props.name}</button>
+			<button disabled={this.props.playing} onClick={this.props.playSound}>{this.props.description}</button>
 		);
 	}
 }
@@ -19,7 +19,8 @@ class App extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			soundPlaying: true
+			soundPlaying: true,
+			sounds: {}
 		};
 
 		this.playSound = this.playSound.bind(this);
@@ -27,33 +28,48 @@ class App extends React.Component{
 
 	componentDidMount(){
 		socket.on('statusUpdate', (data) => {
-			console.log("Status update : "+ data.playing);
+			console.log('------ Status update started -------')
 			this.setState({soundPlaying: data.playing});
+			console.log('------ Status update ended -------')
+		});
+		socket.on('updateSounds', (data) => {
+			console.log('------ updateSounds started -------')
+			this.setState({sounds: data.sounds});
+			console.log('------ updateSounds ended -------')
 		});
 	}
 
-	playSound(path){
-		console.log('emit playsound');
-		socket.emit('playSoundEvent', path);
+	playSound(sound){
+		console.log('-------------- sound : '+sound.id+sound.extension+'----------------');
+		console.log(sound);
+		socket.emit('playSoundEvent', sound.id+sound.extension);
 	}
 
 	stopAllSound(){
 		socket.emit('stopAllSoundEvent');
 	}
 
-	renderButton(path, name){
+	renderButton(sound){
 		return(
-			<Sound /*disabled={this.state.soundPlaying}*/ path={path} name={name} playSound={() => this.playSound(path)} />
+			<Sound /*disabled={this.state.soundPlaying}*/ key={sound.id} description={sound.description} playSound={() => this.playSound(sound)} />
 		);
 	}
 
 	render(){
+		const sounds = this.state.sounds;
+		const buttons = Object.values(sounds).map((sound) => {
+			/*console.log('-------------- sound ----------------')
+			console.log(sound)
+			console.log('-------------------------------------')*/
+			return(
+				this.renderButton(sound)
+			);
+		});
+
 		return (
 			<main>
 				{/*<Header />*/}
-					{this.renderButton('./sounds/aller_viens_gamin.mp3', 'GAMIN, REVIENS GAMIN !')}
-					{this.renderButton('./sounds/jémal.mp3', 'J\'ai maaal !')}
-					<p>playing : {this.state.soundPlaying ? 'Playing' : 'Silent'}</p>
+					{buttons}
 				{/*<Footer />*/}
 			</main>
 		);
