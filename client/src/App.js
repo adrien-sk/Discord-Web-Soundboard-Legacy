@@ -1,12 +1,19 @@
 import React from 'react';
 import socketIOClient from 'socket.io-client';
 
-import logo from './logo.svg';
-import './App.css';
+const socket = socketIOClient({transports: ['websocket']});
 
-const socket = socketIOClient({
-	transports: ['websocket']
-  });
+class Sound extends React.Component{
+	constructor(props){
+		super(props);
+	}
+
+	render(){
+		return(
+			<button disabled={this.props.playing} onClick={this.props.playSound}>{this.props.name}</button>
+		);
+	}
+}
 
 class App extends React.Component{
 	constructor(props){
@@ -20,22 +27,35 @@ class App extends React.Component{
 
 	componentDidMount(){
 		socket.on('statusUpdate', (data) => {
+			console.log("Status update : "+ data.playing);
 			this.setState({soundPlaying: data.playing});
 		});
 	}
 
-	playSound(){
-		socket.emit('playSound');
+	playSound(path){
+		console.log('emit playsound');
+		socket.emit('playSoundEvent', path);
+	}
+
+	stopAllSound(){
+		socket.emit('stopAllSoundEvent');
+	}
+
+	renderButton(path, name){
+		return(
+			<Sound /*disabled={this.state.soundPlaying}*/ path={path} name={name} playSound={() => this.playSound(path)} />
+		);
 	}
 
 	render(){
 		return (
-			<div className="App">
-				<header className="App-header">
-					<img src={logo} className="App-logo" alt="logo" />
-					<button disabled={this.state.soundPlaying} onClick={this.playSound}>Play a sound</button>
-				</header>
-			</div>
+			<main>
+				{/*<Header />*/}
+					{this.renderButton('./sounds/aller_viens_gamin.mp3', 'GAMIN, REVIENS GAMIN !')}
+					{this.renderButton('./sounds/jémal.mp3', 'J\'ai maaal !')}
+					<p>playing : {this.state.soundPlaying ? 'Playing' : 'Silent'}</p>
+				{/*<Footer />*/}
+			</main>
 		);
 	}	
 }
