@@ -1,34 +1,26 @@
 {
   "name": "discord-web-soundboard",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
-  },
+  "version": "0.0.0",
+  "description": "Discord soundboard with web app on react",
+  "main": "server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "node server.js"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nadrielle/Discord-Web-Soundboard.git"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "author": "Skrzypczak Adrien",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Nadrielle/Discord-Web-Soundboard/issues"
+  },
+  "homepage": "https://github.com/Nadrielle/Discord-Web-Soundboard#readme",
+  "dependencies": {
+    "@discordjs/opus": "^0.3.2",
+    "discord.js": "^12.2.0",
+    "express": "^4.17.1",
+    "ffmpeg-static": "^4.2.2",
+    "socket.io": "^2.3.0"
   }
 }
