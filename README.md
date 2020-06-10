@@ -12,6 +12,10 @@ sudo a2enmod proxy_wstunnel
 
 always restart apache
 
+The idea is to have a web interface using ReactJS to display a list of sound that can be clicked, and play a sound in a discord channel with a bot.
+The back end script will be launched with Node.JS, written using Socket.IO and Discord.JS
+The readme will be updated accordingly.
+
 ## Available Scripts
 
 In the project directory, you can run:
