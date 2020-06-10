@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Nadrielle/Discord-Web-Soundboard#readme",
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
+    "cors": "^2.8.5",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

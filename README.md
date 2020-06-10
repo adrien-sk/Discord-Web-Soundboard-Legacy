@@ -1,4 +1,16 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+When running on apache for production : need to send the socket to default (const socket = socketIOClient({transports: ['websocket']});) and use a proxy in the vhost to redirect
+
+
+sudo apt-get install libapache2-mod-proxy-html libxml2-dev -y
+sudo a2enmod proxy
+sudo a2enmod proxy_wstunnel
+
+
+-- To do : copy vhost example --
+
+
+always restart apache
 
 ## Available Scripts
 
