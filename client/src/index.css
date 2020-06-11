@@ -78,6 +78,7 @@ main{
 	position: relative;
 	width: 280px;
 	text-align: center;
+	text-shadow: 1px 1px #282828;
 }
 
 #buttons .sound:active{
