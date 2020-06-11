@@ -5,7 +5,7 @@ const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const SOUNDS_FOLDER = process.env.SOUNDS_FOLDER;
 const VOICE_CHANNEL = process.env.VOICE_CHANNEL;
 
-//Consts
+//App Consts
 const express = require('express');
 const app = express();
 const server = app.listen(SERVER_PORT, () => console.log(`Server started on port ${SERVER_PORT}`));
@@ -26,54 +26,71 @@ for(const file of soundDataFiles){
 	client.sounds.set(sound.id, sound);
 }
 
+
 //Status of sound playing
 let playing = false;
+//Voice Channel var
+let voiceChannel = null;
 
 //Login the bot to the discord server
 client.login(DISCORD_TOKEN);
 
+			client.on('debug', console.log);
 
-//Receive "connection" event from client : Someone opened the webapp
+
+client.on('ready', () => {
+	console.log(`Logged in as ${client.user.tag}!`);
+	//Hardcoding voicechannel number (later we may get authenticated user current's channel)
+	voiceChannel = client.channels.cache.get(VOICE_CHANNEL);
+});
+  
 io.on('connection', (socket) => {
 	console.log(' - User connected');
 
 	//Send a status update to the client (is a sound playing ?)
 	socket.emit('statusUpdate', {playing: playing});
+
+	//Send list of sounds to client
 	socket.emit('updateSounds', {sounds: client.sounds});
 
 	//Receive Play Sound event
 	socket.on('playSoundEvent', (path) => {
+		console.log('--- playSoundEvent launched ---');
 
-		//Temp Hardcoding my Voice Channel
-		let voiceChannel = client.channels.cache.get(VOICE_CHANNEL);
+		//Is a voice connection existing ? If not, connect it
+		if(client.voice.connections.size <= 0){
+			voiceChannel.join();
+		}
 
-		//Bot Join the channel + Promise : 
-		voiceChannel.join().then(connection => {
+		//Play the sound with provided path
+		const dispatcher = client.voice.connections.first().play(SOUNDS_FOLDER+path, { highWaterMark: 400 }); 
 
-			//Play the sound with provided path
-			const dispatcher = connection.play(SOUNDS_FOLDER+path, { highWaterMark: 500 }); 
+		// Play an Ogg Opus stream
+		//TO DO : transform mp3 in ogg to read stream
+		//const dispatcher = connection.play(fs.createReadStream('audio.ogg'), { type: 'ogg/opus' });
 
-			//On sound start event : update the state with Playing status
-			dispatcher.on('start', () => {
-				playing = true;
-				io.emit('statusUpdate', {playing: playing});
-			});
-			
-			//On sound finish event : update the state with Playing status
-			dispatcher.on('finish', () => {
-				playing = false;
-				io.emit('statusUpdate', {playing: playing});
-			});
-			
-			//Receive "stop all sound" event from client
-			socket.on('stopAllSound', () => {
-				dispatcher.destroy();
-				playing = false;
-				io.emit('statusUpdate', {playing: playing});
-			});
+		//On sound start event : update the state with Playing status
+		dispatcher.on('start', () => {
+			playing = true;
+			io.emit('statusUpdate', {playing: playing});
+		});
+		
+		//On sound finish event : update the state with Playing status
+		dispatcher.on('finish', () => {
+			playing = false;
+			io.emit('statusUpdate', {playing: playing});
+			dispatcher.destroy(); 
+		});
+		
+		//Receive "stop all sound" event from client
+		socket.on('stopAllSound', () => {
+			dispatcher.destroy();
+			playing = false;
+			io.emit('statusUpdate', {playing: playing});
+		});
 
-			dispatcher.on('error', console.error);
-		})
+		dispatcher.on('error', console.error);
+
 	});
 
 	//Receive "disconnect" event from client : Someone closed the webapp
@@ -82,15 +99,4 @@ io.on('connection', (socket) => {
 	});
 });
 
-
-//CORS Declaration
-/*
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Credentials', false);
-    next();
-});
-*/
 app.use(cors());
