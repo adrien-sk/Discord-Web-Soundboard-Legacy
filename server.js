@@ -35,17 +35,14 @@ let voiceChannel = null;
 //Login the bot to the discord server
 client.login(DISCORD_TOKEN);
 
-			client.on('debug', console.log);
 
 
 client.on('ready', () => {
-	console.log(`Logged in as ${client.user.tag}!`);
 	//Hardcoding voicechannel number (later we may get authenticated user current's channel)
 	voiceChannel = client.channels.cache.get(VOICE_CHANNEL);
 });
   
 io.on('connection', (socket) => {
-	console.log(' - User connected');
 
 	//Send a status update to the client (is a sound playing ?)
 	socket.emit('statusUpdate', {playing: playing});
@@ -55,7 +52,6 @@ io.on('connection', (socket) => {
 
 	//Receive Play Sound event
 	socket.on('playSoundEvent', (path) => {
-		console.log('--- playSoundEvent launched ---');
 
 		//Is a voice connection existing ? If not, connect it
 		if(client.voice.connections.size <= 0){
@@ -95,7 +91,7 @@ io.on('connection', (socket) => {
 
 	//Receive "disconnect" event from client : Someone closed the webapp
 	socket.on('disconnect', () => {
-		console.log(' - User disconnected');
+		
 	});
 });
 
