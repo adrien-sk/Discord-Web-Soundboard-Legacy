@@ -1,5 +1,5 @@
 module.exports = {
 	id: 'tdeg_2',
 	description: 'T\'es Dèg ...',
-	extension: '.mp3'
+	extension: '.ogg'
 }
