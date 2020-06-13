@@ -68,17 +68,18 @@ main{
 	align-items: center;
 }
 
-#buttons .sound{
+.btn{
 	background-color: var(--green-color);
 	color: var(--white);
-	padding: 15px;
+	padding: 11px;
 	margin: 0 15px 25px;
 	border-radius: 3px;
 	text-decoration: none;
 	position: relative;
 	width: 280px;
 	text-align: center;
-	text-shadow: 1px 1px #282828;
+	text-shadow: 1px 1px #568e5f;
+	display: block;
 }
 
 #buttons .sound:active{
@@ -102,6 +103,71 @@ main{
 	transition: all 0.1s ease;
 }
 
+#upload-form{
+	width: 400px;
+	max-width: 100%;
+	margin: auto;
+}
+
+#upload-form #files-container{
+	width: /*calc(*/100%;/* - 6px);*/
+	position: relative;
+	height: 100px;
+	margin: 10px 0;
+	border: 3px dashed #fff;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+#upload-form #files-container p{
+	margin-bottom: 10px;
+}
+
+#upload-form #files-container p:last-of-type{
+	margin-bottom: 0;
+}
+
+#upload-form .files{
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	outline: none;
+	opacity: 0;
+}
+
+.form-control{
+	background-color: var(--background-color1);
+	color: var(--white);
+	padding: 11px;
+	margin: 30px 0 0;
+	border-radius: 3px;
+	text-decoration: none;
+	position: relative;
+	width: 280px;
+	text-align: center;
+	display: block;
+	border: 1px solid rgb(32, 32, 32);
+}
+
+#upload-form .form-control{
+	width: 100%;
+}
+
+#upload-form .btn{
+	width: 100%;
+	margin: auto;
+}
+
+#upload-form #form-error{
+	text-align: center;
+	margin-top: 20px;
+	color: var(--red-color);
+}
+
 footer{
 	background-color: var(--background-color1);
 	width: 100%;
@@ -118,4 +184,12 @@ footer a{
 
 footer a:hover{
 	text-decoration: underline;
+}
+
+
+@media(max-width: 1199px){
+	main{
+		margin: 50px 0;
+		max-width: 99%;
+	}
 }

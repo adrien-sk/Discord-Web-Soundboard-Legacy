@@ -1,5 +1,5 @@
 module.exports = {
 	id: 'gitan_ftg',
 	description: 'Fermes ta gueule !',
-	extension: '.mp3'
+	extension: '.ogg'
 }
