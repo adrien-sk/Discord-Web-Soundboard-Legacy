@@ -125,7 +125,7 @@ class App extends React.Component{
 					body: formData
 				};
 		
-				fetch("http://localhost:5000/upload", options).then(res => {
+				fetch("/upload", options).then(res => {
 					socket.emit('soundUploaded');
 				}).catch(err => {
 					console.log(err);
