@@ -1,6 +1,6 @@
 
 <h1 align="center"> Discord Web Soundboard </h1> <br>
-! [Discord Web Soundboard](./doc/doc_header.jpg)
+![Discord Web Soundboard](doc/doc_header.jpg)
 
 
 ## Introduction
@@ -58,7 +58,7 @@ $ npm start
 ```
 The app should launch in your web browser at **localhost:3000/**
 
-! [Discord Web Soundboard](./doc/command_prombts.jpg)
+![Discord Web Soundboard](doc/command_prombts.jpg)
 
 
 ## Features
