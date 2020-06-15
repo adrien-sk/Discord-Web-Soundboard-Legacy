@@ -1,80 +1,81 @@
 
-When running on apache for production : need to send the socket to default (const socket = socketIOClient({transports: ['websocket']});) and use a proxy in the vhost to redirect
+<h1 align="center"> Discord Web Soundboard </h1> <br>
+![Discord Web Soundboard](./doc/doc_header.jpg)
 
 
-sudo apt-get install libapache2-mod-proxy-html libxml2-dev -y
-sudo a2enmod proxy
-sudo a2enmod proxy_wstunnel
+##Introduction
+Simply and quickly connect a Bot to your Discord server, and make him play sounds and music of your choice by using a Web-interface. 
+All your users will be able to play with sounds to emphasize funny discussion/gaming moments !
 
 
--- To do : copy vhost example --
+##Built with
+* **[React.JS](https://reactjs.org/) ** : 16.13.1 : React.JS is used to provide a quick one page web application.
+* **[Node.JS](https://nodejs.org) ** : 13.13.0 : Node.JS provide the back-end functionnalities of the applications.
+* **[Socket.IO](https://socket.io/) ** : 2.3.0 : Socket.IO allow us to easily and quickly share information between clients and our application functionnalities.
+* **[Discord.JS](https://discord.js.org) ** : 12.2.0 : Discord.JS is used for having a Bot playing required sound directly in your Discord server.
+* **[Express.JS](https://expressjs.com/) ** : 4.17.1 : Express.JS handles all our requests from the client
+* **[Formidable](https://www.npmjs.com/package/formidable) ** : 1.2.2 : Formidable is used to allow users to upload their own sounds
+* **[ffmpeg-static](https://www.npmjs.com/package/ffmpeg-static) ** : 4.2.2 : FFMPEG is used to convert **mp3** common files to **ogg** for optimisation
+* **[Dotenv](https://www.npmjs.com/package/dotenv) ** : 8.2.0 : Using Dotenv to manage environment variables from a .env file (eg: "password: process.env.DB_PASS")
+* **[Discordjs/opus](https://github.com/discordjs/opus) ** : 0.3.2 : 
 
 
-always restart apache
+##Local Setup
+First of all, ensure you install [Node.JS](https://nodejs.org), and [Git](https://git-scm.com/) if you plan to clone the repository
 
-## Available Scripts
+```bash
+# Clone this repository
+$ git clone https://github.com/Nadrielle/Discord-Web-Soundboard.git
 
-In the project directory, you can run:
+# Go into the repository
+$ cd discord-web-soundboard
 
-### `npm start`
+# Install dependencies
+$ npm install
+```
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+To Do : Create a wiki to explain how to create a bot on discord.com
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+You'll need to Create a .env file to store some variables as follow :
+```
+# Content of the .env file
+PORT=5000
+DISCORD_TOKEN=#MyDiscordToken(To do : Add a wiki link to explain)
+SOUNDS_FOLDER="./sounds/"
+VOICE_CHANNEL=#MyVoiceChannel(To do : Add a wiki link to explain)
+```
 
-### `npm test`
+You will need one command prombt to run the server, and one to run the react application
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+# Run the server script in one command prombt, in the 'discord-web-soundboard' folder
+$ node server.js
+```
 
-### `npm run build`
+```
+# Run the react app in another command prombt, in the 'discord-web-soundboard/client' folder
+$ npm start
+```
+The app should launch in your web browser at **localhost:3000/**
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+##Features
+* Listing as buttons of the sounds uploaded in the "./sounds" folder
+* Playing of custom sounds by the Bot when clicking any button
+* Upload functionality for MP3/OGG
+* Usage of the bot in a predifined Discord channel
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+##Future features
+* Discord Login integration (Could allow whitelisting, and detection of the user's channel when launching a sound)
+* Visual display of the user launching the sound (We want to know who is spamming this annoying sound =D)
+* Turn button of the playing sound to red : Another click on the button Stop the playing sound
+* More to come ...
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+##Support
+To do
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+##License
+MIT
