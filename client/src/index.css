@@ -84,8 +84,8 @@ main{
 
 #buttons .sound:active{
 	background-color: var(--button-border-color);
-	padding: 12px 15px 15px 15px;
-	margin: 3px 15px 25px;
+	padding: 9px 11px 11px 11px;
+	margin: 2px 15px 25px;
 }
 
 #buttons .sound:hover::after{

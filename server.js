@@ -157,7 +157,7 @@ app.post('/upload', async (req, res) => {
 				let fileContent = `
 				module.exports = {
 					id: '${newFileName}',
-					description: '${soundtitle.replace("'","\\'")}',
+					description: '${soundtitle.replace(/\'/g,"\\'")}',
 					extension: '.ogg'
 				}`;
 				fs.appendFile(SOUNDS_FOLDER+newFileName+'.js', fileContent, err => {
