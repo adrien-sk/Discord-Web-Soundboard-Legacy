@@ -176,10 +176,10 @@ app.post('/upload', async (req, res) => {
 function slugify (str) {
     var map = {
         '_' : ' |-',
-        'a' : 'á|à|ã|â|À|Á|Ã|Â',
-        'e' : 'é|è|ê|É|È|Ê',
-        'i' : 'í|ì|î|Í|Ì|Î',
-        'o' : 'ó|ò|ô|õ|Ó|Ò|Ô|Õ',
+        'a' : 'ä|á|à|ã|â|Ä|À|Á|Ã|Â',
+        'e' : 'ë|é|è|ê|Ë|É|È|Ê',
+        'i' : 'ï|í|ì|î|Ï|Í|Ì|Î',
+        'o' : 'ö|ó|ò|ô|õ|Ö|Ó|Ò|Ô|Õ',
         'u' : 'ú|ù|û|ü|Ú|Ù|Û|Ü',
         'c' : 'ç|Ç',
         'n' : 'ñ|Ñ'
@@ -191,8 +191,7 @@ function slugify (str) {
         str = str.replace(new RegExp(map[pattern], 'g'), pattern);
 	};
 	
-	var regExpr = /[^a-z0-9]/g;
+	var regExpr = /[^a-z0-9_]/g;
 	str = str.replace(regExpr, '');
-	
     return str;
 };
