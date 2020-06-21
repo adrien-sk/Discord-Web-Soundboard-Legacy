@@ -18,7 +18,7 @@ const cmd = require('ffmpeg-static');
 const formidable = require('formidable');
 
 const fs = require('fs');
-const {Client, Collection} = require('discord.js');
+const {Client, Collection, DataResolver} = require('discord.js');
 const client = new Client();
 
 
@@ -35,6 +35,9 @@ app.use(express.urlencoded({extended: false}));
 app.use(cors());
 
 
+//last sound played at
+let lastSoundPlayedAt = Date.now();
+
 //Status of sound playing
 let playing = false;
 //Voice Channel var
@@ -43,7 +46,22 @@ let voiceChannel = null;
 //Login the bot to the discord server
 client.login(DISCORD_TOKEN);
 
-			//client.on('debug', console.log);
+/*client.on('debug', () =>{
+	if(client.voice.connections.size > 0){
+		console.log('Voice connection detected');
+		console.log('Time of Var = '+lastSoundPlayedAt);
+		console.log('Time of Now = '+Date.now());
+		if(Date.now() - lastSoundPlayedAt >= 10000){
+			console.log('Diff > 10s');
+			client.voice.connections.first().disconnect();
+		}
+		//console.log(client.voice.connections.first());
+	}
+	else{
+		console.log('No voice connection');
+	}
+});*/
+
 
 
 client.on('ready', () => {
@@ -68,11 +86,7 @@ io.on('connection', (socket) => {
 			voiceChannel.join();
 		}
 
-		//Play the sound with provided path
-		//const dispatcher = client.voice.connections.first().play(SOUNDS_FOLDER+path, { highWaterMark: 400 }); 
-
 		// Play an Ogg Opus stream
-		//TO DO : transform mp3 in ogg to read stream
 		const dispatcher = client.voice.connections.first().play(fs.createReadStream(SOUNDS_FOLDER+path), { type: 'ogg/opus' });
 
 		//On sound start event : update the state with Playing status
@@ -86,6 +100,8 @@ io.on('connection', (socket) => {
 			playing = false;
 			io.emit('statusUpdate', {playing: playing});
 			dispatcher.destroy(); 
+			lastSoundPlayedAt = Date.now();
+			console.log('Set Var to : '+lastSoundPlayedAt);
 		});
 
 		dispatcher.on('error', console.error);
@@ -94,9 +110,12 @@ io.on('connection', (socket) => {
 		
 	//Receive "stop all sound" event from client
 	socket.on('stopAllSound', () => {
-		//dispatcher.destroy();
-		playing = false;
-		io.emit('statusUpdate', {playing: playing});
+		if(client.voice.connections.size > 0 && client.voice.connections.first().dispatcher !== null){
+			client.voice.connections.first().dispatcher.pause();
+			client.voice.connections.first().dispatcher.destroy();
+			playing = false;
+			io.emit('statusUpdate', {playing: playing});
+		}
 	});
 	
 	//Receive "stop all sound" event from client

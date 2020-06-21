@@ -89,7 +89,7 @@ class App extends React.Component{
 
 	stopAllSound(event){
 		event.preventDefault();
-		socket.emit('stopAllSoundEvent');
+		socket.emit('stopAllSound');
 	}
 
 	onFileChangeHandler(event){
@@ -162,7 +162,7 @@ class App extends React.Component{
 			<div id='page-container'>
 				<Header />
 				<main>
-					{/*<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>*/ }
+					{<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>}
 					<div id="buttons">
 						{buttons}
 					</div>
