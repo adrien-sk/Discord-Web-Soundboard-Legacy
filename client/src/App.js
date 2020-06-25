@@ -89,7 +89,7 @@ class App extends React.Component{
 
 	stopAllSound(event){
 		event.preventDefault();
-		socket.emit('stopAllSoundEvent');
+		socket.emit('stopAllSound');
 	}
 
 	onFileChangeHandler(event){
@@ -162,19 +162,17 @@ class App extends React.Component{
 			<div id='page-container'>
 				<Header />
 				<main>
-					{/*<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>*/ }
+					{<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>}
 					<div id="buttons">
 						{buttons}
 					</div>
 					<div id="upload-form">
-						<form id="upload-form-tag" onSubmit={this.onSubmitForm} noValidate>
-							<input required type="text" name="title" onChange={this.onFileTitleChangeHandler} value={fileTitle} className="form-control" placeholder="Sound title" />
-							<div id="files-container">
-								<input required type="file" name="file" className="files" onChange={this.onFileChangeHandler}/>
-								<p>{file}</p>
-							</div>
-							<a href="#" onClick={this.uploadFile} className="btn">Upload</a>
-						</form>
+						<input required type="text" name="title" onChange={this.onFileTitleChangeHandler} value={fileTitle} className="form-control" placeholder="Sound title" />
+						<div id="files-container">
+							<input required type="file" name="file" className="files" onChange={this.onFileChangeHandler}/>
+							<p>{file}</p>
+						</div>
+						<a href="#" onClick={this.uploadFile} className="btn">Upload</a>
 						<p id="form-error">{formErrorText}</p>
 					</div>
 				</main>
