@@ -80,14 +80,14 @@ io.on('connection', (socket) => {
 	socket.emit('updateSounds', {sounds: client.sounds});
 
 	//Receive Play Sound event
-	socket.on('playSoundEvent', (path) => {
+	socket.on('playSoundEvent', (path, volume) => {
 		//Is a voice connection existing ? If not, connect it
 		if(client.voice.connections.size <= 0){
 			voiceChannel.join();
 		}
 
 		// Play an Ogg Opus stream
-		const dispatcher = client.voice.connections.first().play(fs.createReadStream(SOUNDS_FOLDER+path), { type: 'ogg/opus' });
+		const dispatcher = client.voice.connections.first().play(fs.createReadStream(SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume });
 
 		//On sound start event : update the state with Playing status
 		dispatcher.on('start', () => {

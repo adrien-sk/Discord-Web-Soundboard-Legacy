@@ -32,7 +32,10 @@ class Sound extends React.Component{
 
 	render(){
 		return(
-			<a href="#" className="sound btn" disabled={this.props.playing} onClick={this.props.playSound}>{this.props.description}</a>
+			<div className="sound-wrapper">
+				<a href="#" className="sound btn" disabled={this.props.playing} onClick={this.props.playSound}>{this.props.description}</a>
+				<input type="range" min="0" max="40" defaultValue="10" className="slider"></input>
+			</div>
 		);
 	}
 }
