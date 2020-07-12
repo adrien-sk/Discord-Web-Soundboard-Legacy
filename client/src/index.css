@@ -47,6 +47,21 @@ main{
 	flex: 1;
 }
 
+.volume-wrapper{
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+.volume-wrapper i{
+	cursor: pointer;
+	opacity: .3;
+	transition: all 0.1s ease;
+}
+
+.volume-wrapper i:hover{
+	opacity: .9;
+}
+
 .stop-sound{
 	background-color: var(--red-color);
 	color: var(--white);
@@ -60,12 +75,22 @@ main{
 	display: block;
 }
 
+.stop-sound:active{
+	background-color: var(--red-color);
+	padding: 10px 15px 15px;
+	margin: 5px auto 25px;
+}
+
 #buttons {
 	display: flex;
 	flex-flow: row;
 	flex-wrap: wrap;
 	justify-content: center;
 	align-items: center;
+}
+
+#buttons.hide-volume .sound-wrapper .slider {
+	display: none;
 }
 
 .sound-wrapper{
@@ -89,7 +114,6 @@ main{
 #buttons .sound:active{
 	background-color: var(--button-border-color);
 	padding: 9px 11px 11px 11px;
-	margin: 2px 15px 25px;
 }
 
 #buttons .sound:hover::after{

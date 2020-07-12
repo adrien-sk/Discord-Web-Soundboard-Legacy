@@ -24,7 +24,7 @@ const client = new Client();
 
 //List audio files at opening of the server
 client.sounds = new Collection();
-const soundDataFiles = fs.readdirSync(SOUNDS_FOLDER).filter(file => file.endsWith('.js'));
+const soundDataFiles = fs.readdirSync(SOUNDS_FOLDER).filter(file => file.endsWith('.json'));
 
 for(const file of soundDataFiles){
 	const sound = require(SOUNDS_FOLDER+file);
@@ -87,7 +87,7 @@ io.on('connection', (socket) => {
 		}
 
 		// Play an Ogg Opus stream
-		const dispatcher = client.voice.connections.first().play(fs.createReadStream(SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume });
+		const dispatcher = client.voice.connections.first().play(fs.createReadStream(SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume / 10 });
 
 		//On sound start event : update the state with Playing status
 		dispatcher.on('start', () => {
@@ -101,7 +101,7 @@ io.on('connection', (socket) => {
 			io.emit('statusUpdate', {playing: playing});
 			dispatcher.destroy(); 
 			lastSoundPlayedAt = Date.now();
-			console.log('Set Var to : '+lastSoundPlayedAt);
+			//console.log('Set Var to : '+lastSoundPlayedAt);
 		});
 
 		dispatcher.on('error', console.error);
@@ -118,8 +118,18 @@ io.on('connection', (socket) => {
 		}
 	});
 	
-	//Receive "stop all sound" event from client
+	//Receive sound uploaded event and send update sound to all clients
 	socket.on('soundUploaded', () => {
+		io.emit('updateSounds', {sounds: client.sounds});
+	});
+	
+	//Receive sound uploaded event and send update sound to all clients
+	socket.on('updateSoundVolume', (name, volume) => {
+		let sound = require(SOUNDS_FOLDER+name+'.json');
+		sound.volume = volume;
+		let data = JSON.stringify(sound);
+		fs.writeFileSync(SOUNDS_FOLDER+name+'.json', data);
+		client.sounds.set(sound.id, sound);
 		io.emit('updateSounds', {sounds: client.sounds});
 	});
 
@@ -172,19 +182,19 @@ app.post('/upload', async (req, res) => {
 			else{
 				await fs.unlinkSync(tempFileName);
 
-				//Create JS file
-				let fileContent = `
-				module.exports = {
-					id: '${newFileName}',
-					description: '${soundtitle.replace(/\'/g,"\\'")}',
-					extension: '.ogg'
-				}`;
-				fs.appendFile(SOUNDS_FOLDER+newFileName+'.js', fileContent, err => {
-					//Add JS file of the sound to sounds object
-					const newSound = require(SOUNDS_FOLDER+newFileName+'.js');
-					client.sounds.set(newSound.id, newSound);
-					res.status(200).send();
-				});
+				let sound = { 
+					id: newFileName,
+					description: soundtitle, 
+					extension: '.ogg',
+					volume: 10 
+				};
+				
+				let data = JSON.stringify(sound);
+				fs.writeFileSync(SOUNDS_FOLDER+newFileName+'.json', data);
+		
+				client.sounds.set(sound.id, sound);
+
+				res.status(200).send();
 			}
 		})
 	});

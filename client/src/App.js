@@ -34,7 +34,7 @@ class Sound extends React.Component{
 		return(
 			<div className="sound-wrapper">
 				<a href="#" className="sound btn" disabled={this.props.playing} onClick={this.props.playSound}>{this.props.description}</a>
-				<input type="range" min="0" max="40" defaultValue="10" className="slider"></input>
+				<input data-name={this.props.name} type="range" min="0" max="40" defaultValue={this.props.volume} className="slider" onChange={this.props.volumeChangeHandler} />
 			</div>
 		);
 	}
@@ -74,6 +74,7 @@ class App extends React.Component{
 		this.onFileChangeHandler = this.onFileChangeHandler.bind(this);
 		this.uploadFile = this.uploadFile.bind(this);
 		this.onFileTitleChangeHandler = this.onFileTitleChangeHandler.bind(this);
+		this.onVolumeChangeHandler = this.onVolumeChangeHandler.bind(this);
 	}
 
 	componentDidMount(){
@@ -87,7 +88,7 @@ class App extends React.Component{
 
 	playSound(event, sound){
 		event.preventDefault();
-		socket.emit('playSoundEvent', sound.id+sound.extension);
+		socket.emit('playSoundEvent', sound.id+sound.extension, sound.volume);
 	}
 
 	stopAllSound(event){
@@ -101,6 +102,10 @@ class App extends React.Component{
 
 	onFileTitleChangeHandler(event){
 		this.setState({fileTitleToUpload: event.target.value});
+	}
+
+	onVolumeChangeHandler(event){
+		socket.emit('updateSoundVolume', event.target.dataset.name, event.target.value);
 	}
 
 	uploadFile(event){
@@ -144,9 +149,14 @@ class App extends React.Component{
 		}
 	}
 
+	displayVolumes(){
+		var element = document.getElementById("buttons");
+		element.classList.toggle("hide-volume");
+	}
+
 	renderButton(sound){
 		return(
-			<Sound /*disabled={this.state.soundPlaying}*/ key={sound.id} description={sound.description} playSound={(event) => this.playSound(event, sound)} />
+			<Sound /*disabled={this.state.soundPlaying}*/ key={sound.id} name={sound.id} description={sound.description} playSound={(event) => this.playSound(event, sound)} volume={sound.volume} volumeChangeHandler={this.onVolumeChangeHandler} />
 		);
 	}
 
@@ -165,8 +175,11 @@ class App extends React.Component{
 			<div id='page-container'>
 				<Header />
 				<main>
+					<div className="volume-wrapper">
+						<i class="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
+					</div>
 					{<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>}
-					<div id="buttons">
+					<div id="buttons" className="hide-volume">
 						{buttons}
 					</div>
 					<div id="upload-form">
