@@ -176,7 +176,7 @@ class App extends React.Component{
 				<Header />
 				<main>
 					<div className="volume-wrapper">
-						<i class="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
+						<i className="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
 					</div>
 					{<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>}
 					<div id="buttons" className="hide-volume">
