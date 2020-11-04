@@ -4,7 +4,7 @@
   "description": "Discord soundboard with web app on react",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -22,8 +22,12 @@
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "ffmpeg-static": "^4.2.2",
     "formidable": "^1.2.2",
+    "nodemon": "^2.0.6",
+    "passport": "^0.4.1",
+    "passport-discord": "^0.1.4",
     "socket.io": "^2.3.0"
   }
 }

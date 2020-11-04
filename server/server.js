@@ -1,10 +1,12 @@
 //Define const from .ENV
-require('dotenv').config();
+require('dotenv').config({path: '../.env'});
+const path = require("path");
 const SERVER_PORT = process.env.PORT || 5000;
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const SOUNDS_FOLDER = process.env.SOUNDS_FOLDER;
 const TEMP_FOLDER = process.env.SOUNDS_FOLDER+'temp';
 const VOICE_CHANNEL = process.env.VOICE_CHANNEL;
+
 
 //App Consts
 const express = require('express');
@@ -12,6 +14,14 @@ const app = express();
 const server = app.listen(SERVER_PORT, () => console.log(`Server started on port ${SERVER_PORT}`));
 const io = require('socket.io').listen(server);
 const cors = require('cors');
+const session = require('express-session');
+const passport = require('passport');
+const discordStrategy = require('./strategies/discordstrategy');
+
+
+// Routes 
+const authRoute = require('./routes/auth');
+
 
 const spawn = require('child_process').spawn;
 const cmd = require('ffmpeg-static');
@@ -22,7 +32,7 @@ const {Client, Collection, DataResolver} = require('discord.js');
 const client = new Client();
 
 
-//List audio files at opening of the server
+// List audio files at opening of the server
 client.sounds = new Collection();
 const soundDataFiles = fs.readdirSync(SOUNDS_FOLDER).filter(file => file.endsWith('.json'));
 
@@ -33,6 +43,169 @@ for(const file of soundDataFiles){
 
 app.use(express.urlencoded({extended: false}));
 app.use(cors());
+
+
+
+// ----------------------------- Routes -----------------------------
+
+
+app.use(session({
+	secret: 'MySecretSalt',
+	cookie: {
+		maxAge: 60000 * 60 * 24
+	},
+	saveUninitialized: false, 
+	resave: false,
+	name: 'discord.oauth2'
+}));
+
+
+// Passport
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+const isAuthorized = (req, res, next) => {
+	if(req.user){
+		console.log('User IS logged in');
+		next();
+	}
+	else{
+		console.log('User is NOT logged in');
+		res.redirect('/');
+	}
+}
+
+
+
+// Serve Static React app files
+app.use('/dashboard/static', express.static(path.join(__dirname, "www", "static")));
+
+// Authentication route
+app.use('/auth', authRoute);
+
+// Get Request to Dashboard react app
+app.get('/dashboard', isAuthorized, function(req, res, next) {
+	res.sendFile(path.join(__dirname, "www", "app.html"));
+});
+
+// Get Request to Root (Login Page)
+app.get('/', function(req, res, next) {
+	if(req.user)
+		res.redirect('/dashboard');
+	else
+		res.sendFile(path.join(__dirname, "www", "login.html"));
+});
+
+// Get Request to 404 -> redirect to root
+app.use((req, res) => {
+	res.status(404).redirect('/');
+});
+
+
+// File upload
+app.post('/upload', async (req, res) => {
+	const form = formidable();
+	
+	// ./sounds/test
+	form.uploadDir = TEMP_FOLDER;
+
+	// 50 mo
+	form.maxFileSize = 50 * 1024 * 1024;
+	form.multiples = true;
+
+	form.parse(req, async (err, fields, files) => {
+		if (err) {
+			console.log(err);
+			next(err);
+			return;
+		}
+
+		//Transform to ogg
+		//let oldFileName = files.sounds[0].name; // = "machin.mp3"
+		let tempFileName = files.sounds.path; // = "sounds/test/upload_fdgksdjfglkdjsfhglsdfg"
+		let newFileName = slugify(fields.title);
+		let soundtitle = fields.title;
+
+		let args = [
+			'-y', 
+			'-i', tempFileName,
+			'-c:a', 'libopus', 
+			'-b:a', '96k', 
+			'-f', 'ogg', SOUNDS_FOLDER+newFileName+'.ogg'
+		];
+		
+		//Copy as .ogg and remove temp file
+		let proc = spawn(cmd, args);
+		proc.on('exit', async (err) => {
+
+			if(err){
+				console.log('Ogg Transformation Error !');
+			}
+			else{
+				await fs.unlinkSync(tempFileName);
+
+				let sound = { 
+					id: newFileName,
+					description: soundtitle, 
+					extension: '.ogg',
+					volume: 10 
+				};
+				
+				let data = JSON.stringify(sound);
+				fs.writeFileSync(SOUNDS_FOLDER+newFileName+'.json', data);
+		
+				client.sounds.set(sound.id, sound);
+
+				res.status(200).send();
+			}
+		})
+	});
+});
+
+//-------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+app.get("/auth/spotify", passport.authenticate("spotify"));
+app.get("/auth/spotify/callback",
+    passport.authenticate("spotify"),
+        (req, res) => {
+            res.redirect("/profile");
+        });*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //last sound played at
@@ -69,7 +242,7 @@ client.on('ready', () => {
 	//Hardcoding voicechannel number (later we may get authenticated user current's channel)
 	voiceChannel = client.channels.cache.get(VOICE_CHANNEL);
 });
-  
+
 io.on('connection', (socket) => {
 	console.log(' - User connected');
 
@@ -138,68 +311,6 @@ io.on('connection', (socket) => {
 		console.log(' - User disconnected');
 	});
 });
-
-
-
-app.post('/upload', async (req, res) => {
-	const form = formidable();
-	
-	// ./sounds/test
-	form.uploadDir = TEMP_FOLDER;
-
-	// 50 mo
-	form.maxFileSize = 50 * 1024 * 1024;
-	form.multiples = true;
-
-	form.parse(req, async (err, fields, files) => {
-		if (err) {
-			console.log(err);
-			next(err);
-			return;
-		}
-
-		//Transform to ogg
-		//let oldFileName = files.sounds[0].name; // = "machin.mp3"
-		let tempFileName = files.sounds.path; // = "sounds/test/upload_fdgksdjfglkdjsfhglsdfg"
-		let newFileName = slugify(fields.title);
-		let soundtitle = fields.title;
-
-		let args = [
-			'-y', 
-			'-i', tempFileName,
-			'-c:a', 'libopus', 
-			'-b:a', '96k', 
-			'-f', 'ogg', SOUNDS_FOLDER+newFileName+'.ogg'
-		];
-		
-		//Copy as .ogg and remove temp file
-		let proc = spawn(cmd, args);
-		proc.on('exit', async (err) => {
-
-			if(err){
-				console.log('Ogg Transformation Error !');
-			}
-			else{
-				await fs.unlinkSync(tempFileName);
-
-				let sound = { 
-					id: newFileName,
-					description: soundtitle, 
-					extension: '.ogg',
-					volume: 10 
-				};
-				
-				let data = JSON.stringify(sound);
-				fs.writeFileSync(SOUNDS_FOLDER+newFileName+'.json', data);
-		
-				client.sounds.set(sound.id, sound);
-
-				res.status(200).send();
-			}
-		})
-	});
-});
-
 
 //Function to normalize name for the file
 function slugify (str) {

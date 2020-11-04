@@ -198,4 +198,29 @@ class App extends React.Component{
 	}	
 }
 
+//import {BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
+/*
+class App extends React.Component{
+	constructor(props){
+		super(props);
+		this.state = {}
+	}
+
+	componentDidMount(){
+		fetch("/testapi", {method: 'GET'}).then(res => {
+			console.log(res);
+		}).catch(err => {
+			console.log(err);
+		});
+	}
+
+	render(){
+		return(
+			<h1>My React APP</h1>
+		);
+	}
+}*/
+
+
+
 export default App;
