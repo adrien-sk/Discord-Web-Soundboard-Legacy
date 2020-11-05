@@ -1,225 +1,62 @@
 import React from 'react';
+import Login from './components/login';
+import Dashboard from './components/dashboard';
+import Header from './components/header';
+import Footer from './components/footer';
 import socketIOClient from 'socket.io-client';
-
-const socket = socketIOClient({transports: ['websocket']});
-
-class Header extends React.Component{
-	render(){
-		return(
-			<header>
-				<i className="fab fa-discord logo"></i>
-				<h1>Discord Web Soundboard</h1>
-			</header>
-		);
-	}
-}
-
-class Footer extends React.Component{
-	render(){
-		return(
-			<footer>
-				<p>Discord Web Sounboard</p>
-				<a href="https://github.com/Nadrielle/Discord-Web-Soundboard" target="_blank"><i className="fab fa-github"></i> Source Code</a>
-			</footer>
-		);
-	}
-}
-
-class Sound extends React.Component{
-	constructor(props){
-		super(props);
-	}
-
-	render(){
-		return(
-			<div className="sound-wrapper">
-				<a href="#" className="sound btn" disabled={this.props.playing} onClick={this.props.playSound}>{this.props.description}</a>
-				<input data-name={this.props.name} type="range" min="0" max="40" defaultValue={this.props.volume} className="slider" onChange={this.props.volumeChangeHandler} />
-			</div>
-		);
-	}
-}
-
-class FileUpload extends React.Component{
-	constructor(props){
-		super(props);
-	}
-
-	render(){
-		return(
-			<div id="upload-form">
-				<form method="post" action="#" id="#">
-					<label>Upload Your File </label>
-					<input type="text" name="title" />
-					<input type="file" name="file" className="form-control" />
-					<input type="submit" onClick={this.props.uploadFile} />
-				</form>
-			</div>
-		);
-	}
-}
 
 class App extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			soundPlaying: true,
-			fileToUpload: null,
-			fileTitleToUpload: null,
-			formError: null,
-			sounds: {}
-		};
-
-		this.playSound = this.playSound.bind(this);
-		this.onFileChangeHandler = this.onFileChangeHandler.bind(this);
-		this.uploadFile = this.uploadFile.bind(this);
-		this.onFileTitleChangeHandler = this.onFileTitleChangeHandler.bind(this);
-		this.onVolumeChangeHandler = this.onVolumeChangeHandler.bind(this);
-	}
-
-	componentDidMount(){
-		socket.on('statusUpdate', (data) => {
-			this.setState({soundPlaying: data.playing});
-		});
-		socket.on('updateSounds', (data) => {
-			this.setState({sounds: data.sounds});
-		});
-	}
-
-	playSound(event, sound){
-		event.preventDefault();
-		socket.emit('playSoundEvent', sound.id+sound.extension, sound.volume);
-	}
-
-	stopAllSound(event){
-		event.preventDefault();
-		socket.emit('stopAllSound');
-	}
-
-	onFileChangeHandler(event){
-		this.setState({fileToUpload: event.target.files[0]});
-	}
-
-	onFileTitleChangeHandler(event){
-		this.setState({fileTitleToUpload: event.target.value});
-	}
-
-	onVolumeChangeHandler(event){
-		socket.emit('updateSoundVolume', event.target.dataset.name, event.target.value);
-	}
-
-	uploadFile(event){
-		event.preventDefault();
-
-		if(this.state.fileTitleToUpload === null || this.state.fileTitleToUpload === '' || this.state.fileToUpload === null){
-			if((this.state.fileTitleToUpload === null || this.state.fileTitleToUpload === '') && this.state.fileToUpload === null){
-				this.setState({formError: 'Please fill the Title and select a File'});
-			}
-			else if(this.state.fileToUpload === null){
-				this.setState({formError: 'Please select a File'});
-			}
-			else{
-				this.setState({formError: 'Please fill the Title'});
-			}
-		}
-		else{
-			if(this.state.fileToUpload.name.indexOf('mp3') != -1 || this.state.fileToUpload.name.indexOf('ogg') != -1){
-				var formData = new FormData();
-				formData.set('title', this.state.fileTitleToUpload);
-				formData.append('sounds', this.state.fileToUpload);
-				
-				const options = {
-					method: 'POST',
-					body: formData
-				};
-		
-				fetch("/upload", options).then(res => {
-					socket.emit('soundUploaded');
-				}).catch(err => {
-					console.log(err);
-				});
-
-				this.setState({fileTitleToUpload: ''});
-				this.setState({fileToUpload: null});
-				this.setState({formError: ''});
-			}
-			else{
-				this.setState({formError: 'Please upload an mp3 or ogg'});
-			}
+			authenticated: false,
+			socket: null
 		}
 	}
 
-	displayVolumes(){
-		var element = document.getElementById("buttons");
-		element.classList.toggle("hide-volume");
+	componentDidMount() {
+		fetch("/auth/isloggedin", {
+			method: "GET",
+			credentials: "include",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Credentials": true
+			}
+		})
+		.then(response => {
+			if (response.status === 200) return response.json();
+				throw new Error("failed to authenticate user");
+		})
+		.then(responseJson => {
+			this.setState({
+				authenticated: true,
+				socket: socketIOClient({transports: ['websocket']})
+				//user: responseJson.user
+			});
+		})
+		.catch(error => {
+			this.setState({
+				authenticated: false
+				//error: "Failed to authenticate user"
+			});
+		});
 	}
-
-	renderButton(sound){
-		return(
-			<Sound /*disabled={this.state.soundPlaying}*/ key={sound.id} name={sound.id} description={sound.description} playSound={(event) => this.playSound(event, sound)} volume={sound.volume} volumeChangeHandler={this.onVolumeChangeHandler} />
-		);
-	}
-
+	
 	render(){
-		const fileTitle = this.state.fileTitleToUpload;
-		const sounds = this.state.sounds;
-		const buttons = Object.values(sounds).map((sound) => {
-			return(
-				this.renderButton(sound)
-			);
-		});
-		const formErrorText = this.state.formError;
-		const file = this.state.fileToUpload  ? this.state.fileToUpload.name : 'Click here or Drag a MP3/OGG file';
-
-		return (
+		return(
 			<div id='page-container'>
 				<Header />
-				<main>
-					<div className="volume-wrapper">
-						<i className="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
-					</div>
-					{<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>}
-					<div id="buttons" className="hide-volume">
-						{buttons}
-					</div>
-					<div id="upload-form">
-						<input required type="text" name="title" onChange={this.onFileTitleChangeHandler} value={fileTitle} className="form-control" placeholder="Sound title" />
-						<div id="files-container">
-							<input required type="file" name="file" className="files" onChange={this.onFileChangeHandler}/>
-							<p>{file}</p>
-						</div>
-						<a href="#" onClick={this.uploadFile} className="btn">Upload</a>
-						<p id="form-error">{formErrorText}</p>
-					</div>
-				</main>
+					{this.state.authenticated ? (
+						<Dashboard socket={this.state.socket} />
+					) : (
+						<Login />
+					)}
 				<Footer />
 			</div>
 		);
-	}	
+	}
 }
-
-//import {BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
-/*
-class App extends React.Component{
-	constructor(props){
-		super(props);
-		this.state = {}
-	}
-
-	componentDidMount(){
-		fetch("/testapi", {method: 'GET'}).then(res => {
-			console.log(res);
-		}).catch(err => {
-			console.log(err);
-		});
-	}
-
-	render(){
-		return(
-			<h1>My React APP</h1>
-		);
-	}
-}*/
 
 
 

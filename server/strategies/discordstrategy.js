@@ -2,10 +2,12 @@ const DiscordStrategy = require('passport-discord').Strategy;
 const passport = require('passport');
 
 passport.serializeUser((user, done) => {
+	console.log("Serialize user");
 	done(null, user);
 });
 
 passport.deserializeUser((user, done) => {
+	console.log("DESerialize user");
 	done(null, user);
 });
 

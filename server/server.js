@@ -18,7 +18,6 @@ const session = require('express-session');
 const passport = require('passport');
 const discordStrategy = require('./strategies/discordstrategy');
 
-
 // Routes 
 const authRoute = require('./routes/auth');
 
@@ -42,7 +41,11 @@ for(const file of soundDataFiles){
 }
 
 app.use(express.urlencoded({extended: false}));
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:3000", // allow to server to accept request from different origin
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true // allow session cookie from browser to pass through
+  }));
 
 
 
@@ -73,35 +76,48 @@ const isAuthorized = (req, res, next) => {
 	}
 	else{
 		console.log('User is NOT logged in');
-		res.redirect('/');
+		//res.redirect('/');
+		res.status(401).json({
+			authenticated: false,
+			message: "user has not been authenticated"
+		});
 	}
 }
 
 
 
 // Serve Static React app files
-app.use('/dashboard/static', express.static(path.join(__dirname, "www", "static")));
+//				app.use('/dashboard/static', express.static(path.join(__dirname, "../client/build", "static")));
 
 // Authentication route
 app.use('/auth', authRoute);
 
+/*
+app.get("/", (req, res) => {
+	res.status(200).json({
+		authenticated: true,
+		message: "user successfully authenticated",
+		user: req.user
+	});
+});*/
+
 // Get Request to Dashboard react app
-app.get('/dashboard', isAuthorized, function(req, res, next) {
-	res.sendFile(path.join(__dirname, "www", "app.html"));
-});
+				// app.get('/dashboard', isAuthorized, function(req, res, next) {
+				// 	res.sendFile(path.join(__dirname, "../client/build", "app.html"));
+				// });
 
 // Get Request to Root (Login Page)
-app.get('/', function(req, res, next) {
-	if(req.user)
-		res.redirect('/dashboard');
-	else
-		res.sendFile(path.join(__dirname, "www", "login.html"));
-});
+				// app.get('/', function(req, res, next) {
+				// 	if(req.user)
+				// 		res.redirect('/dashboard');
+				// 	else
+				// 		res.sendFile(path.join(__dirname, "../client/build", "login.html"));
+				// });
 
 // Get Request to 404 -> redirect to root
-app.use((req, res) => {
-	res.status(404).redirect('/');
-});
+				// app.use((req, res) => {
+				// 	res.status(404).redirect('/');
+				// });
 
 
 // File upload
@@ -170,18 +186,6 @@ app.post('/upload', async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /*
 app.get("/auth/spotify", passport.authenticate("spotify"));
 app.get("/auth/spotify/callback",
@@ -189,20 +193,6 @@ app.get("/auth/spotify/callback",
         (req, res) => {
             res.redirect("/profile");
         });*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -253,7 +243,7 @@ io.on('connection', (socket) => {
 	socket.emit('updateSounds', {sounds: client.sounds});
 
 	//Receive Play Sound event
-	socket.on('playSoundEvent', (path, volume) => {
+	socket.on('playSoundEvent',  (path, volume) => {
 		//Is a voice connection existing ? If not, connect it
 		if(client.voice.connections.size <= 0){
 			voiceChannel.join();

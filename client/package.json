@@ -8,19 +8,15 @@
     "@testing-library/user-event": "^7.2.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "sass": "^1.28.0",
     "socket.io-client": "^2.3.0"
   },
   "scripts": {
-    "start": "npm run build && (cd ../server && npm start)",
-    "start-client": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-	"eject": "react-scripts eject",
-	"build-prod": "npm run build && del-cli -f ../server/www/ && cpy build/ ../server/www/ && cd ../server/www/ && renamer --find \"index.html\" --replace \"app.html\" * && cpy ../../client/public/login.html login.html"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -38,7 +34,6 @@
     ]
   },
   "proxy": "http://localhost:5000",
-  "homepage": "dashboard",
   "devDependencies": {
     "typescript": "^4.0.5"
   }
