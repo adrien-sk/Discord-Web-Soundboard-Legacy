@@ -21,7 +21,7 @@ router.get('/', passport.authenticate('discord'));
 
 router.get('/redirect', passport.authenticate('discord', {
 	failureRedirect: '/',
-	successRedirect: 'http://localhost:3000'
+	successRedirect: '/'
 }));
 
 module.exports = router;

@@ -4,7 +4,9 @@
   "description": "Discord soundboard with web app on react",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+	"start": "nodemon server.js",
+	"migrate": "knex migrate:latest",
+	"rollback": "knex migrate:rollback"
   },
   "repository": {
     "type": "git",
@@ -25,9 +27,11 @@
     "express-session": "^1.17.1",
     "ffmpeg-static": "^4.2.2",
     "formidable": "^1.2.2",
+    "knex": "^0.21.12",
     "nodemon": "^2.0.6",
     "passport": "^0.4.1",
     "passport-discord": "^0.1.4",
+    "pg": "^8.4.2",
     "socket.io": "^2.3.0"
   }
 }
