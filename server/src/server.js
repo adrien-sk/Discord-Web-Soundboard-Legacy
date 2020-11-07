@@ -1,26 +1,11 @@
-//Define const from .ENV
-require('dotenv').config({path: '../.env'});
-const path = require("path");
+
+// Define const from .ENV
+require('dotenv').config({path: '../../.env'});
+
 const SERVER_PORT = process.env.PORT || 5000;
-const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-const SOUNDS_FOLDER = process.env.SOUNDS_FOLDER;
 const TEMP_FOLDER = process.env.SOUNDS_FOLDER+'temp';
-const VOICE_CHANNEL = process.env.VOICE_CHANNEL;
 
-
-//App Consts
-const express = require('express');
-const app = express();
-const server = app.listen(SERVER_PORT, () => console.log(`Server started on port ${SERVER_PORT}`));
-const io = require('socket.io').listen(server);
-const cors = require('cors');
-const session = require('express-session');
-const passport = require('passport');
-const discordStrategy = require('./strategies/discordstrategy');
-
-// Routes 
-const authRoute = require('./routes/auth');
-
+// Sounds files --------------
 
 const spawn = require('child_process').spawn;
 const cmd = require('ffmpeg-static');
@@ -30,98 +15,38 @@ const fs = require('fs');
 const {Client, Collection, DataResolver} = require('discord.js');
 const client = new Client();
 
+/* 
+	App
+	Server
+	Socket.IO
+*/
+
+const app = require('./app');
+
+const server = app.listen(SERVER_PORT, () => console.log(`Server started on port ${SERVER_PORT}`));
+
+const io = require('socket.io').listen(server);
+
+
+//Login the bot to the discord server
+client.login(process.env.DISCORD_TOKEN);
+
+
 
 // List audio files at opening of the server
 client.sounds = new Collection();
-const soundDataFiles = fs.readdirSync(SOUNDS_FOLDER).filter(file => file.endsWith('.json'));
+const soundDataFiles = fs.readdirSync(process.env.SOUNDS_FOLDER).filter(file => file.endsWith('.json'));
 
 for(const file of soundDataFiles){
-	const sound = require(SOUNDS_FOLDER+file);
+	const sound = require(process.env.SOUNDS_FOLDER+file);
 	client.sounds.set(sound.id, sound);
 }
 
-app.use(express.urlencoded({extended: false}));
-app.use(cors({
-    origin: "http://localhost:3000", // allow to server to accept request from different origin
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true // allow session cookie from browser to pass through
-  }));
-
-
-
-// ----------------------------- Routes -----------------------------
-
-
-app.use(session({
-	secret: 'MySecretSalt',
-	cookie: {
-		maxAge: 60000 * 60 * 24
-	},
-	saveUninitialized: false, 
-	resave: false,
-	name: 'discord.oauth2'
-}));
-
-
-// Passport
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-
-const isAuthorized = (req, res, next) => {
-	if(req.user){
-		console.log('User IS logged in');
-		next();
-	}
-	else{
-		console.log('User is NOT logged in');
-		//res.redirect('/');
-		res.status(401).json({
-			authenticated: false,
-			message: "user has not been authenticated"
-		});
-	}
-}
-
-
-
-// Serve Static React app files
-//				app.use('/dashboard/static', express.static(path.join(__dirname, "../client/build", "static")));
-
-// Authentication route
-app.use('/auth', authRoute);
-
-/*
-app.get("/", (req, res) => {
-	res.status(200).json({
-		authenticated: true,
-		message: "user successfully authenticated",
-		user: req.user
-	});
-});*/
-
-// Get Request to Dashboard react app
-				// app.get('/dashboard', isAuthorized, function(req, res, next) {
-				// 	res.sendFile(path.join(__dirname, "../client/build", "app.html"));
-				// });
-
-// Get Request to Root (Login Page)
-				// app.get('/', function(req, res, next) {
-				// 	if(req.user)
-				// 		res.redirect('/dashboard');
-				// 	else
-				// 		res.sendFile(path.join(__dirname, "../client/build", "login.html"));
-				// });
-
-// Get Request to 404 -> redirect to root
-				// app.use((req, res) => {
-				// 	res.status(404).redirect('/');
-				// });
+// -------------------------
 
 
 // File upload
-app.post('/upload', async (req, res) => {
+app.post('/api/upload', async (req, res) => {
 	const form = formidable();
 	
 	// ./sounds/test
@@ -149,7 +74,7 @@ app.post('/upload', async (req, res) => {
 			'-i', tempFileName,
 			'-c:a', 'libopus', 
 			'-b:a', '96k', 
-			'-f', 'ogg', SOUNDS_FOLDER+newFileName+'.ogg'
+			'-f', 'ogg', process.env.SOUNDS_FOLDER+newFileName+'.ogg'
 		];
 		
 		//Copy as .ogg and remove temp file
@@ -170,7 +95,7 @@ app.post('/upload', async (req, res) => {
 				};
 				
 				let data = JSON.stringify(sound);
-				fs.writeFileSync(SOUNDS_FOLDER+newFileName+'.json', data);
+				fs.writeFileSync(process.env.SOUNDS_FOLDER+newFileName+'.json', data);
 		
 				client.sounds.set(sound.id, sound);
 
@@ -186,17 +111,6 @@ app.post('/upload', async (req, res) => {
 
 
 
-/*
-app.get("/auth/spotify", passport.authenticate("spotify"));
-app.get("/auth/spotify/callback",
-    passport.authenticate("spotify"),
-        (req, res) => {
-            res.redirect("/profile");
-        });*/
-
-
-
-
 
 //last sound played at
 let lastSoundPlayedAt = Date.now();
@@ -206,8 +120,6 @@ let playing = false;
 //Voice Channel var
 let voiceChannel = null;
 
-//Login the bot to the discord server
-client.login(DISCORD_TOKEN);
 
 /*client.on('debug', () =>{
 	if(client.voice.connections.size > 0){
@@ -227,11 +139,18 @@ client.login(DISCORD_TOKEN);
 
 
 
+
+
+
+
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	//Hardcoding voicechannel number (later we may get authenticated user current's channel)
-	voiceChannel = client.channels.cache.get(VOICE_CHANNEL);
+	voiceChannel = client.channels.cache.get(process.env.VOICE_CHANNEL);
 });
+
+
+
 
 io.on('connection', (socket) => {
 	console.log(' - User connected');
@@ -250,7 +169,7 @@ io.on('connection', (socket) => {
 		}
 
 		// Play an Ogg Opus stream
-		const dispatcher = client.voice.connections.first().play(fs.createReadStream(SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume / 10 });
+		const dispatcher = client.voice.connections.first().play(fs.createReadStream(process.env.SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume / 10 });
 
 		//On sound start event : update the state with Playing status
 		dispatcher.on('start', () => {
@@ -288,10 +207,10 @@ io.on('connection', (socket) => {
 	
 	//Receive sound uploaded event and send update sound to all clients
 	socket.on('updateSoundVolume', (name, volume) => {
-		let sound = require(SOUNDS_FOLDER+name+'.json');
+		let sound = require(process.env.SOUNDS_FOLDER+name+'.json');
 		sound.volume = volume;
 		let data = JSON.stringify(sound);
-		fs.writeFileSync(SOUNDS_FOLDER+name+'.json', data);
+		fs.writeFileSync(process.env.SOUNDS_FOLDER+name+'.json', data);
 		client.sounds.set(sound.id, sound);
 		io.emit('updateSounds', {sounds: client.sounds});
 	});
@@ -301,6 +220,9 @@ io.on('connection', (socket) => {
 		console.log(' - User disconnected');
 	});
 });
+
+
+
 
 //Function to normalize name for the file
 function slugify (str) {

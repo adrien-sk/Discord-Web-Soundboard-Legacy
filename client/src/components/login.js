@@ -13,7 +13,7 @@ const Login = () => {
 	return(
 		<div>
 			<h1>Login : Please authenticate</h1>
-			<p><a href="http://localhost:5000/auth" className="btn">Dev Auth</a></p>
+			<p><a href="http://localhost:5000/api/auth" className="btn">Dev Auth</a></p>
 		</div>
 	);
 }
