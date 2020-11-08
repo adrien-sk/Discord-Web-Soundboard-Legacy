@@ -20,6 +20,8 @@
   "homepage": "https://github.com/Nadrielle/Discord-Web-Soundboard#readme",
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
+    "connect-redis": "^5.0.0",
+    "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
@@ -33,7 +35,9 @@
     "objection": "^2.2.3",
     "passport": "^0.4.1",
     "passport-discord": "^0.1.4",
+    "passport.socketio": "^3.7.0",
     "pg": "^8.4.2",
+    "redis": "^3.0.2",
     "socket.io": "^2.3.0"
   }
 }

@@ -4,7 +4,7 @@ const tableNames = require('../constants/tableNames');
 exports.up = async (knex) => {
 	await knex.schema.createTable(tableNames.users, (table) => {
 		table.string('discord_id').primary().notNullable().unique();
-		table.string('nickname').notNullable();
+		table.string('username').notNullable();
 	});
 
 	await knex.schema.createTable(tableNames.sounds, (table) => {

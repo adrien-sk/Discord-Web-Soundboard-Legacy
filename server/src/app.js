@@ -1,7 +1,7 @@
 //App Consts
 const express = require('express');
 const helmet = require('helmet');
-const session = require('express-session');
+const sessionMiddleware = require('./sessionMiddleware');
 const passport = require('passport');
 const cors = require('cors');
 
@@ -17,15 +17,9 @@ app.use(cors({
 	credentials: true // allow session cookie from browser to pass through
 }));
 
-app.use(session({
-	secret: 'MySecretSalt',
-	cookie: {
-		maxAge: 60000 * 60 * 24
-	},
-	saveUninitialized: false, 
-	resave: false,
-	name: 'discord.oauth2'
-}));
+app.set('trust proxy', 1);
+
+app.use(sessionMiddleware);
 
 app.use(passport.initialize());
 

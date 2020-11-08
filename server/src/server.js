@@ -1,12 +1,13 @@
-
-// Define const from .ENV
 require('dotenv').config({path: '../../.env'});
 
 const SERVER_PORT = process.env.PORT || 5000;
 const TEMP_FOLDER = process.env.SOUNDS_FOLDER+'temp';
 
-// Sounds files --------------
+const redisStore = require('./redisClient');
 
+const passportSocketIo = require("passport.socketio");
+
+// Sounds files --------------
 const spawn = require('child_process').spawn;
 const cmd = require('ffmpeg-static');
 const formidable = require('formidable');
@@ -21,15 +22,23 @@ const client = new Client();
 	Socket.IO
 */
 
+
 const app = require('./app');
 
 const server = app.listen(SERVER_PORT, () => console.log(`Server started on port ${SERVER_PORT}`));
 
 const io = require('socket.io').listen(server);
 
+io.use(passportSocketIo.authorize({
+	key:          'discord.oauth2',  // the name of the cookie where express/connect stores its session_id
+	secret:       'MySecretSalt',    // the session_secret to parse the cookie
+	store: redisStore,
+}));
 
 //Login the bot to the discord server
 client.login(process.env.DISCORD_TOKEN);
+
+
 
 
 
@@ -108,10 +117,6 @@ app.post('/api/upload', async (req, res) => {
 //-------------------------------------------------------------------
 
 
-
-
-
-
 //last sound played at
 let lastSoundPlayedAt = Date.now();
 
@@ -146,15 +151,21 @@ let voiceChannel = null;
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	//Hardcoding voicechannel number (later we may get authenticated user current's channel)
-	voiceChannel = client.channels.cache.get(process.env.VOICE_CHANNEL);
+	//voiceChannel = client.channels.cache.get(process.env.VOICE_CHANNEL);
+
+	/*for (let item of voiceChannel.guild.members.cache.values()) {
+		console.log(item.user.username);
+	}*/
 });
 
 
 
 
 io.on('connection', (socket) => {
-	console.log(' - User connected');
-
+	console.log(' --------------------- User connected ------------------------');
+	//var userId = socket.request .request.session.passport.user;
+	//let userDiscordID = Date.now();
+	let discordID = socket.request.user.id;
 	//Send a status update to the client (is a sound playing ?)
 	socket.emit('statusUpdate', {playing: playing});
 
@@ -162,31 +173,65 @@ io.on('connection', (socket) => {
 	socket.emit('updateSounds', {sounds: client.sounds});
 
 	//Receive Play Sound event
-	socket.on('playSoundEvent',  (path, volume) => {
-		//Is a voice connection existing ? If not, connect it
-		if(client.voice.connections.size <= 0){
-			voiceChannel.join();
+	socket.on('playSoundEvent', (path, volume) => {
+		let voiceChannels = (client.channels.cache.filter(item => item.type === 'voice'));
+		let userFound = false;
+
+		for(let channel of voiceChannels){
+			for(let member of channel[1].members){
+				if(member[0] === discordID){
+					userFound = true;
+					voiceChannel = channel[1];
+					break;
+				}
+			}
+			if(userFound)
+				break;
 		}
 
-		// Play an Ogg Opus stream
-		const dispatcher = client.voice.connections.first().play(fs.createReadStream(process.env.SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume / 10 });
-
-		//On sound start event : update the state with Playing status
-		dispatcher.on('start', () => {
-			playing = true;
-			io.emit('statusUpdate', {playing: playing});
-		});
 		
-		//On sound finish event : update the state with Playing status
-		dispatcher.on('finish', () => {
-			playing = false;
-			io.emit('statusUpdate', {playing: playing});
-			dispatcher.destroy(); 
-			lastSoundPlayedAt = Date.now();
-			//console.log('Set Var to : '+lastSoundPlayedAt);
-		});
+		//Is a voice connection existing ? If not, connect it
 
-		dispatcher.on('error', console.error);
+		let delay = 0;
+		if(client.voice.connections.size > 0){
+			console.log('size : '+client.voice.connections.size);
+			if(client.voice.connections.first().channel.id !== voiceChannel.id){
+				console.log('Bot switching channel');
+				voiceChannel.join();
+				delay = 400;
+			}
+		}
+		else{
+			voiceChannel.join();
+			delay = 400;
+		}
+
+
+		// Timeout when bot joins the channel, to avoid cut sound
+		setTimeout(() => { 
+			// Play an Ogg Opus stream
+			const dispatcher = client.voice.connections.first().play(fs.createReadStream(process.env.SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume / 10 });
+			
+			//On sound start event : update the state with Playing status
+			dispatcher.on('start', () => {
+				playing = true;
+				io.emit('statusUpdate', {playing: playing});
+			});
+			
+			//On sound finish event : update the state with Playing status
+			dispatcher.on('finish', () => {
+				playing = false;
+				io.emit('statusUpdate', {playing: playing});
+				dispatcher.destroy(); 
+				lastSoundPlayedAt = Date.now();
+				//console.log('Set Var to : '+lastSoundPlayedAt);
+			});
+
+			dispatcher.on('error', console.error);
+		}, delay);
+
+
+		
 
 	});
 		
