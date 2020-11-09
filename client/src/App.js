@@ -15,7 +15,7 @@ class App extends React.Component{
 	}
 
 	componentDidMount() {
-		fetch("/api/auth/isloggedin", {
+		fetch("/auth/isloggedin", {
 			method: "GET",
 			credentials: "include",
 			headers: {

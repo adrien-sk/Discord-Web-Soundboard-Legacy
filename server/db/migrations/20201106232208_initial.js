@@ -9,9 +9,9 @@ exports.up = async (knex) => {
 
 	await knex.schema.createTable(tableNames.sounds, (table) => {
 		table.increments().notNullable();
-		table.string('display_name').notNullable().unique();
+		table.text('display_name').notNullable().unique();
 		table.string('file_name').notNullable().unique();	
-		table.datetime('created_at').notNullable().default(Knex.now);
+		table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
 	});
 
 	await knex.schema.createTable(tableNames.categories, (table) => {
@@ -22,10 +22,11 @@ exports.up = async (knex) => {
 
 	await knex.schema.createTable(tableNames.users_sounds, (table) => {
 		table.increments().notNullable();
+		table.string('user_id').notNullable().references('discord_id').inTable(tableNames.users).onDelete('CASCADE');
 		table.integer('category_id').notNullable().references('id').inTable(tableNames.categories).onDelete('CASCADE');
 		table.integer('sound_id').notNullable().references('id').inTable(tableNames.sounds).onDelete('CASCADE');
-		table.integer('volume').notNullable();
-		table.integer('order').notNullable();
+		table.integer('volume').notNullable();// TODO : defaultTo
+		table.integer('order').notNullable();// TODO : max + 1 (think about sorting and updates)
 	});
 };
 

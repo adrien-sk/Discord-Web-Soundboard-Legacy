@@ -6,6 +6,7 @@ const passport = require('passport');
 const cors = require('cors');
 
 const routes = require('./routes/routes');
+const authRoutes = require('./routes/auth/auth.routes');
 const discordStrategy = require('./strategies/discordstrategy');
 
 const app = express();
@@ -33,6 +34,7 @@ app.use(helmet());
 
 /* routes */
 
+app.use('/auth', authRoutes);
 app.use('/api', routes);
 
 app.get('/', (req, res) => {

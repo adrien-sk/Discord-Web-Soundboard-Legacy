@@ -7,14 +7,19 @@ const redisStore = require('./redisClient');
 
 const passportSocketIo = require("passport.socketio");
 
+const dbRequests = require ('./database/db.requests');
+const db = require ('../src/database/db.connection');
+
+
 // Sounds files --------------
 const spawn = require('child_process').spawn;
 const cmd = require('ffmpeg-static');
 const formidable = require('formidable');
-
 const fs = require('fs');
+
 const {Client, Collection, DataResolver} = require('discord.js');
 const client = new Client();
+
 
 /* 
 	App
@@ -24,6 +29,8 @@ const client = new Client();
 
 
 const app = require('./app');
+const tableNames = require('../db/constants/tableNames');
+const { knexSnakeCaseMappers } = require('objection');
 
 const server = app.listen(SERVER_PORT, () => console.log(`Server started on port ${SERVER_PORT}`));
 
@@ -44,12 +51,106 @@ client.login(process.env.DISCORD_TOKEN);
 
 // List audio files at opening of the server
 client.sounds = new Collection();
-const soundDataFiles = fs.readdirSync(process.env.SOUNDS_FOLDER).filter(file => file.endsWith('.json'));
+//const soundDataFiles = fs.readdirSync(process.env.SOUNDS_FOLDER).filter(file => file.endsWith('.json'));
 
-for(const file of soundDataFiles){
-	const sound = require(process.env.SOUNDS_FOLDER+file);
-	client.sounds.set(sound.id, sound);
-}
+(async () => {
+	let reqSounds = await dbRequests.getAllSounds();
+	
+	for(let i=0; i<reqSounds.length; i++){
+		client.sounds.set(reqSounds[i].id, reqSounds[i]);
+	}
+})();
+/*
+	let reqInsert2 = await db(tableNames.categories).insert([
+		{
+			user_id: '314837688379375616',
+			name: 'Musique'
+		},
+		{
+			user_id: '314837688379375616',
+			name: 'Films'
+		},
+		{
+			user_id: '314837688379375616',
+			name: "Létâist d'accents"
+		},
+	]);*/
+
+	/*
+let reqInsert = await db(tableNames.users_sounds).insert([
+	{
+		user_id: '314837688379375616',
+		category_id: 1,
+		sound_id: 1,
+		volume: 10,
+		order: 1
+	},
+	{
+		user_id: '314837688379375616',
+		category_id: 1,
+		sound_id: 2,
+		volume: 10,
+		order: 1
+	},
+	{
+		user_id: '314837688379375616',
+		category_id: 1,
+		sound_id: 3,
+		volume: 10,
+		order: 1
+	},
+	{
+		user_id: '314837688379375616',
+		category_id: 2,
+		sound_id: 9,
+		volume: 10,
+		order: 1
+	},
+	{
+		user_id: '314837688379375616',
+		category_id: 2,
+		sound_id: 19,
+		volume: 10,
+		order: 1
+	},
+	{
+		user_id: '314837688379375616',
+		category_id: 3,
+		sound_id: 21,
+		volume: 10,
+		order: 1
+	}
+]);*/
+/*
+	var promises = [];
+	for(const file of soundDataFiles){
+		const sound = require(process.env.SOUNDS_FOLDER+file);
+		client.sounds.set(sound.id, sound);
+
+		let insertedSound =
+		db(tableNames.sounds).insert({
+			display_name: sound.description,
+			file_name: sound.id+''+sound.extension
+		});
+	
+		promises.push(insertedSound);
+	}
+
+	Promise.all(promises).then(() => console.log('Promises done')).catch(() => console.log('promises fail'));
+
+})();*/
+
+	
+
+
+
+
+
+
+
+
+
+
 
 // -------------------------
 
@@ -191,48 +292,45 @@ io.on('connection', (socket) => {
 
 		
 		//Is a voice connection existing ? If not, connect it
-
-		let delay = 0;
-		if(client.voice.connections.size > 0){
-			console.log('size : '+client.voice.connections.size);
-			if(client.voice.connections.first().channel.id !== voiceChannel.id){
-				console.log('Bot switching channel');
+		if(userFound){
+			let delay = 0;
+			if(client.voice.connections.size > 0){
+				console.log('size : '+client.voice.connections.size);
+				if(client.voice.connections.first().channel.id !== voiceChannel.id){
+					console.log('Bot switching channel');
+					voiceChannel.join();
+					delay = 400;
+				}
+			}
+			else{
 				voiceChannel.join();
 				delay = 400;
 			}
+	
+	
+			// Timeout when bot joins the channel, to avoid cut sound
+			setTimeout(() => { 
+				// Play an Ogg Opus stream
+				const dispatcher = client.voice.connections.first().play(fs.createReadStream(process.env.SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume / 10 });
+				
+				//On sound start event : update the state with Playing status
+				dispatcher.on('start', () => {
+					playing = true;
+					io.emit('statusUpdate', {playing: playing});
+				});
+				
+				//On sound finish event : update the state with Playing status
+				dispatcher.on('finish', () => {
+					playing = false;
+					io.emit('statusUpdate', {playing: playing});
+					dispatcher.destroy(); 
+					lastSoundPlayedAt = Date.now();
+					//console.log('Set Var to : '+lastSoundPlayedAt);
+				});
+	
+				dispatcher.on('error', console.error);
+			}, delay);
 		}
-		else{
-			voiceChannel.join();
-			delay = 400;
-		}
-
-
-		// Timeout when bot joins the channel, to avoid cut sound
-		setTimeout(() => { 
-			// Play an Ogg Opus stream
-			const dispatcher = client.voice.connections.first().play(fs.createReadStream(process.env.SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume / 10 });
-			
-			//On sound start event : update the state with Playing status
-			dispatcher.on('start', () => {
-				playing = true;
-				io.emit('statusUpdate', {playing: playing});
-			});
-			
-			//On sound finish event : update the state with Playing status
-			dispatcher.on('finish', () => {
-				playing = false;
-				io.emit('statusUpdate', {playing: playing});
-				dispatcher.destroy(); 
-				lastSoundPlayedAt = Date.now();
-				//console.log('Set Var to : '+lastSoundPlayedAt);
-			});
-
-			dispatcher.on('error', console.error);
-		}, delay);
-
-
-		
-
 	});
 		
 	//Receive "stop all sound" event from client

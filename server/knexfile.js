@@ -7,7 +7,8 @@ module.exports = {
 		connection: {
 			database: process.env.POSTGRES_DB,
 			user:     process.env.POSTGRES_USER,
-			password: process.env.POSTGRES_PASSWORD
+			password: process.env.POSTGRES_PASSWORD,
+			charset   : 'utf8'
 		},
 		migrations: {
 			directory: './db/migrations'

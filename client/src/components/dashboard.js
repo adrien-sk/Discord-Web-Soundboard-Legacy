@@ -61,11 +61,39 @@ class Dashboard extends React.Component{
 		this.socket.on('updateSounds', (data) => {
 			this.setState({sounds: data.sounds});
 		});
+		// Get users categories
+		/*fetch("http://localhost:5000/api/getusercategories", {
+			method: 'GET',
+			credentials: "include",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Credentials": true
+			}}
+		).then(res => {
+			console.log(res)
+		}).catch(err => {
+			console.log(err);
+		});
+		// Get users sounds
+		fetch("http://localhost:5000/api/getusersounds", {
+			method: 'GET',
+			credentials: "include",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Credentials": true
+			}}
+		).then(res => {
+			console.log(res)
+		}).catch(err => {
+			console.log(err);
+		});*/
 	}
 
 	playSound(event, sound){
 		event.preventDefault();
-		this.socket.emit('playSoundEvent', sound.id+sound.extension, sound.volume);
+		this.socket.emit('playSoundEvent', sound.file_name, '10'/*sound.volume*/);
 	}
 
 	stopAllSound(event){
@@ -133,7 +161,7 @@ class Dashboard extends React.Component{
 
 	renderButton(sound){
 		return(
-			<Sound /*disabled={this.state.soundPlaying}*/ key={sound.id} name={sound.id} description={sound.description} playSound={(event) => this.playSound(event, sound)} volume={sound.volume} volumeChangeHandler={this.onVolumeChangeHandler} />
+			<Sound /*disabled={this.state.soundPlaying}*/ key={sound.id} name={sound.file_name} description={sound.display_name} playSound={(event) => this.playSound(event, sound)} volume='10'/*{sound.volume}*/ volumeChangeHandler={this.onVolumeChangeHandler} />
 		);
 	}
 
