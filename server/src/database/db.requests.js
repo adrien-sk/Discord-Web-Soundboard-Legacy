@@ -81,8 +81,6 @@ const requests = {
 			category_id: categoryId
 		});
 
-		console.log(req);
-
 		return req;
 	},
 }

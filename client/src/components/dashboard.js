@@ -16,25 +16,6 @@ class Sound extends React.Component{
 	}
 }
 
-class FileUpload extends React.Component{
-	constructor(props){
-		super(props);
-	}
-
-	render(){
-		return(
-			<div id="upload-form">
-				<form method="post" action="#" id="#">
-					<label>Upload Your File </label>
-					<input type="text" name="title" />
-					<input type="file" name="file" className="form-control" />
-					<input type="submit" onClick={this.props.uploadFile} />
-				</form>
-			</div>
-		);
-	}
-}
-
 class Dashboard extends React.Component{
 	constructor(props){
 		super(props);
@@ -64,39 +45,9 @@ class Dashboard extends React.Component{
 		});
 		this.socket.on('updateSounds', (data) => {
 			this.setState({sounds: data.sounds});
-		});/*
-		// Get users categories
-		fetch("http://localhost:5000/api/getusercategories", {
-			method: 'GET',
-			credentials: "include",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-				"Access-Control-Allow-Credentials": true
-			}}
-		).then(res => {
-			console.log(res)
-		}).catch(err => {
-			console.log(err);
-		});*/
-		// Get users sounds
+		});
 		
 		this.onRefreshUserSounds();
-		//console.log(this.state.userSounds);
-			/*await fetch("http://localhost:5000/api/getusersoundsobject", {
-				method: 'GET',
-				credentials: "include",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-					"Access-Control-Allow-Credentials": true
-				}}
-			)
-			.then(response => response.json())
-			.then(response => {this.setState({userSounds: response});})
-			.catch(err => {
-				console.log(err);
-			});*/
 	}
 
 	playSound(event, sound){
@@ -176,7 +127,7 @@ class Dashboard extends React.Component{
 		this.setState({ userSounds: jsonSounds, isLoaded: true });
 	}
 
-	async updateUserSoundHandler(userSoundId, newCategory){
+	updateUserSoundHandler = async (userSoundId, newCategory) => {
 		const responseSoundUpdate = await fetch(`http://localhost:5000/api/updateusersound`, {
 			method: 'PUT',
 			credentials: "include",
@@ -190,8 +141,8 @@ class Dashboard extends React.Component{
 				'newCategory': newCategory
 			})
 		});
-
 		this.onRefreshUserSounds();
+
 		//const jsonSoundUpdate = responseSoundUpdate.json();
 		//console.log(jsonSoundUpdate);
 	}	

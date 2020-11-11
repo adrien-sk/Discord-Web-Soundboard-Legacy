@@ -50,6 +50,7 @@ header h1{
 			background: purple;
 			display: flex;
 			justify-content: center;
+			min-height: 50px;
 
 			&.hover{
 				background: pink;
