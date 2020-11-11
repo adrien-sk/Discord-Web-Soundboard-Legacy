@@ -15,8 +15,13 @@ router.get('/getusercategories', async (req, res) => {
 	res.json(dbResults);
 });
 
-router.get('/getusersounds', async (req, res) => {
-	const dbResults = await dbRequests.getUserSounds(req.user.id);
+router.get('/getusersoundsobject', async (req, res) => {
+	const dbResults = await dbRequests.getUserSoundsObject(req.user.id);
+	res.json(dbResults);
+});
+
+router.put('/updateusersound', async (req, res) => {
+	const dbResults = await dbRequests.updateUserSound(req.body.userSoundId, req.body.newCategory);
 	res.json(dbResults);
 });
 

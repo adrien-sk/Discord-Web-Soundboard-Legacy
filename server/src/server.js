@@ -295,9 +295,7 @@ io.on('connection', (socket) => {
 		if(userFound){
 			let delay = 0;
 			if(client.voice.connections.size > 0){
-				console.log('size : '+client.voice.connections.size);
 				if(client.voice.connections.first().channel.id !== voiceChannel.id){
-					console.log('Bot switching channel');
 					voiceChannel.join();
 					delay = 400;
 				}

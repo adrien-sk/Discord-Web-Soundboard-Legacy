@@ -1,4 +1,5 @@
 import React from 'react';
+import UserBoard from './userBoard';
 
 class Sound extends React.Component{
 	constructor(props){
@@ -42,7 +43,9 @@ class Dashboard extends React.Component{
 			fileToUpload: null,
 			fileTitleToUpload: null,
 			formError: null,
-			sounds: {}
+			sounds: {},
+			userSounds: {},
+			isLoaded: false
 		};
 
 		this.socket = props.socket;
@@ -52,31 +55,18 @@ class Dashboard extends React.Component{
 		this.uploadFile = this.uploadFile.bind(this);
 		this.onFileTitleChangeHandler = this.onFileTitleChangeHandler.bind(this);
 		this.onVolumeChangeHandler = this.onVolumeChangeHandler.bind(this);
+		this.onRefreshUserSounds = this.onRefreshUserSounds.bind(this);
 	}
 
-	componentDidMount(){
+	async componentDidMount(){
 		this.socket.on('statusUpdate', (data) => {
 			this.setState({soundPlaying: data.playing});
 		});
 		this.socket.on('updateSounds', (data) => {
 			this.setState({sounds: data.sounds});
-		});
+		});/*
 		// Get users categories
-		/*fetch("http://localhost:5000/api/getusercategories", {
-			method: 'GET',
-			credentials: "include",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-				"Access-Control-Allow-Credentials": true
-			}}
-		).then(res => {
-			console.log(res)
-		}).catch(err => {
-			console.log(err);
-		});
-		// Get users sounds
-		fetch("http://localhost:5000/api/getusersounds", {
+		fetch("http://localhost:5000/api/getusercategories", {
 			method: 'GET',
 			credentials: "include",
 			headers: {
@@ -89,6 +79,24 @@ class Dashboard extends React.Component{
 		}).catch(err => {
 			console.log(err);
 		});*/
+		// Get users sounds
+		
+		this.onRefreshUserSounds();
+		//console.log(this.state.userSounds);
+			/*await fetch("http://localhost:5000/api/getusersoundsobject", {
+				method: 'GET',
+				credentials: "include",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+					"Access-Control-Allow-Credentials": true
+				}}
+			)
+			.then(response => response.json())
+			.then(response => {this.setState({userSounds: response});})
+			.catch(err => {
+				console.log(err);
+			});*/
 	}
 
 	playSound(event, sound){
@@ -154,6 +162,40 @@ class Dashboard extends React.Component{
 		}
 	}
 
+	onRefreshUserSounds = async () => {
+		const responseSounds = await fetch(`http://localhost:5000/api/getusersoundsobject`, {
+			method: 'GET',
+			credentials: "include",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Credentials": true
+			}
+		});
+		const jsonSounds = await responseSounds.json();
+		this.setState({ userSounds: jsonSounds, isLoaded: true });
+	}
+
+	async updateUserSoundHandler(userSoundId, newCategory){
+		const responseSoundUpdate = await fetch(`http://localhost:5000/api/updateusersound`, {
+			method: 'PUT',
+			credentials: "include",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Credentials": true
+			},
+			body: JSON.stringify({
+				'userSoundId': userSoundId,
+				'newCategory': newCategory
+			})
+		});
+
+		this.onRefreshUserSounds();
+		//const jsonSoundUpdate = responseSoundUpdate.json();
+		//console.log(jsonSoundUpdate);
+	}	
+
 	displayVolumes(){
 		var element = document.getElementById("buttons");
 		element.classList.toggle("hide-volume");
@@ -178,6 +220,7 @@ class Dashboard extends React.Component{
 
 		return (
 			<main>
+				{ this.state.isLoaded && <UserBoard userSounds={this.state.userSounds} onUpdateSound={this.updateUserSoundHandler} /> }
 				<div className="volume-wrapper">
 					<i className="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
 				</div>

@@ -4,6 +4,8 @@ import Dashboard from './components/dashboard';
 import Header from './components/header';
 import Footer from './components/footer';
 import socketIOClient from 'socket.io-client';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 class App extends React.Component{
 	constructor(props){
@@ -45,15 +47,17 @@ class App extends React.Component{
 	
 	render(){
 		return(
-			<div id='page-container'>
-				<Header />
-					{this.state.authenticated ? (
-						<Dashboard socket={this.state.socket} />
-					) : (
-						<Login />
-					)}
-				<Footer />
-			</div>
+			<DndProvider backend={HTML5Backend}>
+				<div id='page-container'>
+					<Header />
+						{this.state.authenticated ? (
+							<Dashboard socket={this.state.socket} />
+						) : (
+							<Login />
+						)}
+					<Footer />
+				</div>
+			</DndProvider>
 		);
 	}
 }

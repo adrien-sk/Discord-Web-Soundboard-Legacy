@@ -42,6 +42,30 @@ header h1{
 	font-size: 2rem;
 }
 
+/*---------------*/
+
+.user-categories{
+	.user-category{
+		.user-sounds{
+			background: purple;
+			display: flex;
+			justify-content: center;
+
+			&.hover{
+				background: pink;
+			}
+
+			.user-sound{
+				background: green;
+				padding: 10px;
+				margin: 10px;
+			}
+		}
+	}
+}
+
+/*----------------*/
+
 main{
 	width: 100%;
 	margin: 50px auto;

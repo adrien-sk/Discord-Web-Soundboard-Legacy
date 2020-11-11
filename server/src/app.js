@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const sessionMiddleware = require('./sessionMiddleware');
 const passport = require('passport');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
 const routes = require('./routes/routes');
 const authRoutes = require('./routes/auth/auth.routes');
@@ -27,6 +28,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(express.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
 app.use(helmet());
 

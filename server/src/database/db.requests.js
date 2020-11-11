@@ -43,6 +43,48 @@ const requests = {
 
 		return req;
 	},
+	getUserSoundsObject: async (id) => {
+		const categoriesResult = await dbConnection(tableNames.categories).select('id', 'name').where({
+			user_id: id
+		});
+
+		for(let i=0; i < categoriesResult.length; i++){
+			let sounds = [];
+			
+			const soundsInCategoryResult = await dbConnection(tableNames.users_sounds).select('*').where({
+				user_id: id,
+				category_id: categoriesResult[i].id
+			});
+
+
+			for(let j=0; j < soundsInCategoryResult.length; j++){
+				const soundResult = await dbConnection(tableNames.sounds).select('*').where({
+					id: soundsInCategoryResult[j].sound_id
+				}).first();
+
+				soundResult.user_sound_id = soundsInCategoryResult[j].id;
+				/*soundResult.user_id = id;
+				soundResult.user_category_id = categoriesResult[i].id;*/
+
+				sounds.push(soundResult);
+			}
+
+			categoriesResult[i].sounds = sounds;
+		}
+
+		return categoriesResult;
+	},
+	updateUserSound:  async (userSoundId, categoryId) => {
+		const req = await dbConnection(tableNames.users_sounds).where({
+			id: userSoundId
+		}).update({
+			category_id: categoryId
+		});
+
+		console.log(req);
+
+		return req;
+	},
 }
 
 module.exports = requests;
