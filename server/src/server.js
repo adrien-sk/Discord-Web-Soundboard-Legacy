@@ -49,17 +49,20 @@ client.login(process.env.DISCORD_TOKEN);
 
 
 
+const getAllSounds =  async () => {
+	client.sounds.clear();
+	const filteredSounds = await dbRequests.getAllSoundsFiltered();
+
+	for(let i=0; i<filteredSounds.length; i++){
+		client.sounds.set(filteredSounds[i].id, filteredSounds[i]);
+	}
+}
+
+
 // List audio files at opening of the server
 client.sounds = new Collection();
-//const soundDataFiles = fs.readdirSync(process.env.SOUNDS_FOLDER).filter(file => file.endsWith('.json'));
 
-(async () => {
-	let reqSounds = await dbRequests.getAllSounds();
-	
-	for(let i=0; i<reqSounds.length; i++){
-		client.sounds.set(reqSounds[i].id, reqSounds[i]);
-	}
-})();
+getAllSounds();
 /*
 	let reqInsert2 = await db(tableNames.categories).insert([
 		{
@@ -310,7 +313,6 @@ io.on('connection', (socket) => {
 			setTimeout(() => { 
 				// Play an Ogg Opus stream
 				const dispatcher = client.voice.connections.first().play(fs.createReadStream(process.env.SOUNDS_FOLDER+path), { type: 'ogg/opus', volume: volume / 10 });
-				
 				//On sound start event : update the state with Playing status
 				dispatcher.on('start', () => {
 					playing = true;
@@ -354,6 +356,18 @@ io.on('connection', (socket) => {
 		fs.writeFileSync(process.env.SOUNDS_FOLDER+name+'.json', data);
 		client.sounds.set(sound.id, sound);
 		io.emit('updateSounds', {sounds: client.sounds});
+	});
+
+	socket.on('userSettingsUpdated', async () => {
+		var test = await getAllSounds();
+		//test.then(() => {
+			console.log(client.sounds.size+' - - - - - emit io');
+			io.emit('updateSounds', {sounds: client.sounds});
+		//}).catch((err) => {
+		//	console.log(err);
+		//});
+		
+		
 	});
 
 	//Receive "disconnect" event from client : Someone closed the webapp

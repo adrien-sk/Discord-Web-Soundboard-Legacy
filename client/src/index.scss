@@ -46,6 +46,8 @@ header h1{
 
 .user-categories{
 	.user-category{
+		position: relative;
+
 		.user-sounds{
 			background: purple;
 			display: flex;
@@ -62,6 +64,34 @@ header h1{
 				margin: 10px;
 			}
 		}
+
+		.delete-category i{
+			margin: 25px;
+			font-size: 25px;
+			cursor: pointer;
+			position: absolute;
+			top: -20px;
+			right: 0;
+		}
+	}
+
+	.new-category i{
+		margin: 25px;
+		font-size: 25px;
+		cursor: pointer;
+	}
+}
+
+.library{
+	background: brown;
+	display: flex;
+	width: 100%;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+
+	&.hover{
+		background: red;
 	}
 }
 

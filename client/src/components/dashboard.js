@@ -1,5 +1,6 @@
 import React from 'react';
 import UserBoard from './userBoard';
+import Library from './library';
 
 class Sound extends React.Component{
 	constructor(props){
@@ -20,23 +21,28 @@ class Dashboard extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
+			userId: props.userId,
 			soundPlaying: true,
 			fileToUpload: null,
 			fileTitleToUpload: null,
 			formError: null,
-			sounds: {},
-			userSounds: {},
+			sounds: [],
+			userSounds: [],
 			isLoaded: false
 		};
 
 		this.socket = props.socket;
 
-		this.playSound = this.playSound.bind(this);
 		this.onFileChangeHandler = this.onFileChangeHandler.bind(this);
 		this.uploadFile = this.uploadFile.bind(this);
 		this.onFileTitleChangeHandler = this.onFileTitleChangeHandler.bind(this);
 		this.onVolumeChangeHandler = this.onVolumeChangeHandler.bind(this);
 		this.onRefreshUserSounds = this.onRefreshUserSounds.bind(this);
+		this.playSound = this.playSound.bind(this);
+		this.removeUserSoundHandler = this.removeUserSoundHandler.bind(this);
+		this.onAddUserCategory = this.onAddUserCategory.bind(this);
+		this.updateCategoryNameHandler = this.updateCategoryNameHandler.bind(this);
+		this.deleteCategoryHandler = this.deleteCategoryHandler.bind(this);
 	}
 
 	async componentDidMount(){
@@ -50,8 +56,8 @@ class Dashboard extends React.Component{
 		this.onRefreshUserSounds();
 	}
 
-	playSound(event, sound){
-		event.preventDefault();
+	playSound = (sound) => {
+		console.log('Playing sound');
 		this.socket.emit('playSoundEvent', sound.file_name, '10'/*sound.volume*/);
 	}
 
@@ -123,12 +129,15 @@ class Dashboard extends React.Component{
 				"Access-Control-Allow-Credentials": true
 			}
 		});
+		console.log('--- refresh Sound ---');
 		const jsonSounds = await responseSounds.json();
 		this.setState({ userSounds: jsonSounds, isLoaded: true });
+		this.socket.emit('userSettingsUpdated');
 	}
 
-	updateUserSoundHandler = async (userSoundId, newCategory) => {
-		const responseSoundUpdate = await fetch(`http://localhost:5000/api/updateusersound`, {
+	updateUserSoundHandler = async (type, userSoundId, newCategory) => {
+		const requestUrl = type === 'user-sound' ? 'updateusersound' : 'addusersound';
+		const responseSoundUpdate = await fetch(`http://localhost:5000/api/${requestUrl}`, {
 			method: 'PUT',
 			credentials: "include",
 			headers: {
@@ -142,42 +151,104 @@ class Dashboard extends React.Component{
 			})
 		});
 		this.onRefreshUserSounds();
-
-		//const jsonSoundUpdate = responseSoundUpdate.json();
-		//console.log(jsonSoundUpdate);
 	}	
+
+	updateCategoryNameHandler = async (categoryId, newCategoryName) => {
+		const responseSoundUpdate = await fetch(`http://localhost:5000/api/updatecategoryname`, {
+			method: 'PUT',
+			credentials: "include",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Credentials": true
+			},
+			body: JSON.stringify({
+				'categoryId': categoryId,
+				'newCategoryName': newCategoryName
+			})
+		});
+		this.onRefreshUserSounds();
+	}
+
+	removeUserSoundHandler = async (userSoundId) => {
+		const responseSoundUpdate = await fetch(`http://localhost:5000/api/deleteusersound`, {
+			method: 'DELETE',
+			credentials: "include",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Credentials": true
+			},
+			body: JSON.stringify({
+				'userSoundId': userSoundId
+			})
+		});
+		this.onRefreshUserSounds();
+	}	
+
+	onAddUserCategory = async () => {
+		const responseNewCategory = await fetch(`http://localhost:5000/api/addusercategory`, {
+			method: 'POST',
+			credentials: "include",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Credentials": true
+			}
+		});
+
+		this.onRefreshUserSounds();
+	}
+
+	deleteCategoryHandler = async (categoryId) => {
+		const responseDeleteCategory = await fetch(`http://localhost:5000/api/deleteusercategory`, {
+			method: 'DELETE',
+			credentials: "include",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Credentials": true
+			},
+			body: JSON.stringify({
+				'categoryId': categoryId
+			})
+		});
+
+		this.onRefreshUserSounds();
+	}
 
 	displayVolumes(){
 		var element = document.getElementById("buttons");
 		element.classList.toggle("hide-volume");
 	}
 
-	renderButton(sound){
-		return(
-			<Sound /*disabled={this.state.soundPlaying}*/ key={sound.id} name={sound.file_name} description={sound.display_name} playSound={(event) => this.playSound(event, sound)} volume='10'/*{sound.volume}*/ volumeChangeHandler={this.onVolumeChangeHandler} />
-		);
-	}
+	// renderButton(sound){
+	// 	return(
+	// 		<Sound /*disabled={this.state.soundPlaying}*/ key={sound.id} name={sound.file_name} description={sound.display_name} playSound={(event) => this.playSound(event, sound)} volume='10'/*{sound.volume}*/ volumeChangeHandler={this.onVolumeChangeHandler} />
+	// 	);
+	// }
 
 	render(){
 		const fileTitle = this.state.fileTitleToUpload;
 		const sounds = this.state.sounds;
-		const buttons = Object.values(sounds).map((sound) => {
+		/*const buttons = Object.values(sounds).map((sound) => {
 			return(
 				this.renderButton(sound)
 			);
-		});
+		});*/
 		const formErrorText = this.state.formError;
 		const file = this.state.fileToUpload  ? this.state.fileToUpload.name : 'Click here or Drag a MP3/OGG file';
 
 		return (
 			<main>
-				{ this.state.isLoaded && <UserBoard userSounds={this.state.userSounds} onUpdateSound={this.updateUserSoundHandler} /> }
+				{ this.state.isLoaded && <UserBoard userSounds={this.state.userSounds} onUpdateSound={this.updateUserSoundHandler} playSound={this.playSound} onAddUserCategory={this.onAddUserCategory} onUpdateCategoryName={this.updateCategoryNameHandler} onDeleteCategory={this.deleteCategoryHandler} /> }
 				<div className="volume-wrapper">
 					<i className="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
 				</div>
 				{<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>}
 				<div id="buttons" className="hide-volume">
-					{buttons}
+					<Library librarySounds={this.state.sounds} playSound={this.playSound} removeUserSoundHandler={this.removeUserSoundHandler} volumeChangeHandler={this.onVolumeChangeHandler} />
+					{/* {buttons} */}
 				</div>
 				<div id="upload-form">
 					<input required type="text" name="title" onChange={this.onFileTitleChangeHandler} value={fileTitle} className="form-control" placeholder="Sound title" />

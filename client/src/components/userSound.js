@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 
-const UserSound = ({ sound }) => {
+const UserSound = ({ sound, playSound }) => {
 	const [{ isDragging }, drag] = useDrag({
 		item: {
 			type: 'user-sound',
@@ -14,8 +14,8 @@ const UserSound = ({ sound }) => {
 	//console.log(sound);
 
 	return(
-		<div className="user-sound" ref={drag}>
-			{sound.display_name}
+		<div className="user-sound sound-wrapper" ref={drag}>
+			<button className="sound btn" onClick={() => playSound(sound)}>{sound.display_name}</button>
 		</div>
 	);
 }

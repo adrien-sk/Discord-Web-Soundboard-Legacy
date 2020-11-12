@@ -11,7 +11,8 @@ router.get("/isloggedin", (req, res) => {
 		console.log('User IS logged in');
 		res.json({
 			success: true,
-			message: "user has successfully authenticated"
+			message: "user has successfully authenticated",
+			userId: req.user.id
 		});
 	}
 	else

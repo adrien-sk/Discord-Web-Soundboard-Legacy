@@ -12,7 +12,8 @@ class App extends React.Component{
 		super(props);
 		this.state = {
 			authenticated: false,
-			socket: null
+			socket: null,
+			userId: null
 		}
 	}
 
@@ -33,8 +34,8 @@ class App extends React.Component{
 		.then(responseJson => {
 			this.setState({
 				authenticated: true,
-				socket: socketIOClient({transports: ['websocket']})
-				//user: responseJson.user
+				socket: socketIOClient({transports: ['websocket']}),
+				userId: responseJson.userId
 			});
 		})
 		.catch(error => {
@@ -51,7 +52,7 @@ class App extends React.Component{
 				<div id='page-container'>
 					<Header />
 						{this.state.authenticated ? (
-							<Dashboard socket={this.state.socket} />
+							<Dashboard socket={this.state.socket} userId={this.state.userId} />
 						) : (
 							<Login />
 						)}

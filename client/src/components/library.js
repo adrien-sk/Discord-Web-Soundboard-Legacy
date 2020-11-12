@@ -1,20 +1,27 @@
 import React from 'react';
-import { useDrag } from 'react-dnd';
+import { useDrop } from 'react-dnd';
+import LibrarySound from './librarySound';
 
-const Library = ({ sound }) => {
-	/*const [{ isDragging }, drag] = useDrag({
-		item: {
-			type: 'user-sound',
-			id: sound.id	
+const Library = ({ librarySounds, playSound, volumeChangeHandler, removeUserSoundHandler}) => {
+	const [{isOver}, drop] = useDrop({
+		accept: 'user-sound',
+		drop: (item, monitor) => {
+			removeUserSoundHandler(item.id)
 		},
 		collect: monitor => ({
-			isDragging: !!monitor.isDragging()
+			isOver: !!monitor.isOver()
 		})
-	});*/
+	});
+
+	const hoverClass = isOver ? ' hover ' : '';
 
 	return(
-		<div className="user-sound" ref={drag}>
-			{sound.display_name}
+		<div className={"library"+hoverClass} ref={drop}>
+			{
+				librarySounds.map(sound => {
+					return <LibrarySound key={sound.id} sound={sound} playSound={playSound} volumeChangeHandler={volumeChangeHandler}/>
+				})
+			}
 		</div>
 	);
 }
