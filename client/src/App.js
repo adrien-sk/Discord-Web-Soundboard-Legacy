@@ -4,13 +4,16 @@ import Dashboard from './components/dashboard';
 import Header from './components/header';
 import Footer from './components/footer';
 import socketIOClient from 'socket.io-client';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 class App extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
 			authenticated: false,
-			socket: null
+			socket: null,
+			userId: null
 		}
 	}
 
@@ -31,8 +34,8 @@ class App extends React.Component{
 		.then(responseJson => {
 			this.setState({
 				authenticated: true,
-				socket: socketIOClient({transports: ['websocket']})
-				//user: responseJson.user
+				socket: socketIOClient({transports: ['websocket']}),
+				userId: responseJson.userId
 			});
 		})
 		.catch(error => {
@@ -45,15 +48,13 @@ class App extends React.Component{
 	
 	render(){
 		return(
-			<div id='page-container'>
-				<Header />
-					{this.state.authenticated ? (
-						<Dashboard socket={this.state.socket} />
-					) : (
-						<Login />
-					)}
-				<Footer />
-			</div>
+			<DndProvider backend={HTML5Backend}>
+				{this.state.authenticated ? (
+					<Dashboard socket={this.state.socket} userId={this.state.userId} />
+				) : (
+					<Login />
+				)}
+			</DndProvider>
 		);
 	}
 }

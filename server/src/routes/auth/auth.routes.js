@@ -2,6 +2,8 @@ const router = require('express').Router();
 const passport = require('passport');
 
 
+router.get('/', passport.authenticate('discord'));
+
 // when login is successful, retrieve user info
 router.get("/isloggedin", (req, res) => {
 	console.log('/isloggedin');
@@ -10,14 +12,12 @@ router.get("/isloggedin", (req, res) => {
 		res.json({
 			success: true,
 			message: "user has successfully authenticated",
-			user: req.user
+			userId: req.user.id
 		});
 	}
 	else
 		console.log('User is NOT logged in');
 });
-
-router.get('/', passport.authenticate('discord'));
 
 router.get('/redirect', passport.authenticate('discord', {
 	failureRedirect: '/',
