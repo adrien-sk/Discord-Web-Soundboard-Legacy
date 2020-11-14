@@ -11,10 +11,11 @@ const UserSound = ({ sound, playSound }) => {
 			isDragging: !!monitor.isDragging()
 		})
 	});
-	//console.log(sound);
+
+	const isDraggingClass = isDragging ? ' is-dragging ' : '';
 
 	return(
-		<button className="sound btn" ref={drag} onClick={() => playSound(sound)}>{sound.display_name}</button>
+		<span className={'sound btn'+isDraggingClass} ref={drag} onClick={() => playSound(sound)}>{sound.display_name}</span>
 	);
 }
 

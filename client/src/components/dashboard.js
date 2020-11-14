@@ -2,21 +2,6 @@ import React from 'react';
 import UserBoard from './userBoard';
 import Library from './library';
 
-class Sound extends React.Component{
-	constructor(props){
-		super(props);
-	}
-
-	render(){
-		return(
-			<div className="sound-wrapper">
-				<a href="#" className="sound btn" disabled={this.props.playing} onClick={this.props.playSound}>{this.props.description}</a>
-				<input data-name={this.props.name} type="range" min="0" max="40" defaultValue={this.props.volume} className="slider" onChange={this.props.volumeChangeHandler} />
-			</div>
-		);
-	}
-}
-
 class Dashboard extends React.Component{
 	constructor(props){
 		super(props);
@@ -43,6 +28,7 @@ class Dashboard extends React.Component{
 		this.onAddUserCategory = this.onAddUserCategory.bind(this);
 		this.updateCategoryNameHandler = this.updateCategoryNameHandler.bind(this);
 		this.deleteCategoryHandler = this.deleteCategoryHandler.bind(this);
+		this.collapseLeftPanelHandler = this.collapseLeftPanelHandler.bind(this);
 	}
 
 	async componentDidMount(){
@@ -217,6 +203,12 @@ class Dashboard extends React.Component{
 		this.onRefreshUserSounds();
 	}
 
+	collapseLeftPanelHandler = () => {
+		let leftPanel = document.querySelector('.left-panel');
+		leftPanel.classList.toggle('open');
+		console.log('left pnael handler');
+	}
+
 	displayVolumes(){
 		var element = document.getElementById("buttons");
 		element.classList.toggle("hide-volume");
@@ -244,11 +236,13 @@ class Dashboard extends React.Component{
 				<div className="left-panel">
 					<header>
 						<h1>Discord Web Soundboard</h1>
-						<div className="logo"><i className="fab fa-discord"></i></div>
+						<div className="logo"><img src="/logo_soundboard.svg" /></div>
 					</header>
 					<Library librarySounds={this.state.sounds} playSound={this.playSound} removeUserSoundHandler={this.removeUserSoundHandler} volumeChangeHandler={this.onVolumeChangeHandler} />
+					<div className="collapse-leftpanel" onClick={this.collapseLeftPanelHandler}><i className="fas fa-angle-right"></i><i className="fas fa-angle-left"></i></div>
 				</div>
 				<div id='page-container'>
+					<div className="stop-sound" onClick={(event) => this.stopAllSound(event)}><i class="fas fa-volume-mute"></i></div>
 					{ this.state.isLoaded && <UserBoard userSounds={this.state.userSounds} onUpdateSound={this.updateUserSoundHandler} playSound={this.playSound} onAddUserCategory={this.onAddUserCategory} onUpdateCategoryName={this.updateCategoryNameHandler} onDeleteCategory={this.deleteCategoryHandler} /> }
 					{/* <div className="volume-wrapper">
 						<i className="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
