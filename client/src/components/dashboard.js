@@ -247,7 +247,7 @@ class Dashboard extends React.Component{
 					{/* <div className="volume-wrapper">
 						<i className="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
 					</div> */}
-					<div id="upload-form">
+					<div id="upload-form" style="display: none;">
 						<input required type="text" name="title" onChange={this.onFileTitleChangeHandler} value={fileTitle} className="form-control" placeholder="Sound title" />
 						<div id="files-container">
 							<input required type="file" name="file" className="files" onChange={this.onFileChangeHandler}/>
