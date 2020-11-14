@@ -140,6 +140,14 @@ const requests = {
 
 		return req;
 	},
+	addSound:  async (displayName, fileName) => {
+		const req = await dbConnection(tableNames.sounds).insert({
+			display_name: displayName,
+			file_name: fileName
+		});
+
+		return req;
+	},
 }
 
 module.exports = requests;

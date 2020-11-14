@@ -1,7 +1,6 @@
 require('dotenv').config({path: '../../.env'});
 
 const SERVER_PORT = process.env.PORT || 5000;
-const TEMP_FOLDER = process.env.SOUNDS_FOLDER+'temp';
 
 const redisStore = require('./redisClient');
 
@@ -12,9 +11,6 @@ const db = require ('../src/database/db.connection');
 
 
 // Sounds files --------------
-const spawn = require('child_process').spawn;
-const cmd = require('ffmpeg-static');
-const formidable = require('formidable');
 const fs = require('fs');
 
 const {Client, Collection, DataResolver} = require('discord.js');
@@ -157,66 +153,6 @@ let reqInsert = await db(tableNames.users_sounds).insert([
 
 // -------------------------
 
-
-// File upload
-app.post('/api/upload', async (req, res) => {
-	const form = formidable();
-	
-	// ./sounds/test
-	form.uploadDir = TEMP_FOLDER;
-
-	// 50 mo
-	form.maxFileSize = 50 * 1024 * 1024;
-	form.multiples = true;
-
-	form.parse(req, async (err, fields, files) => {
-		if (err) {
-			console.log(err);
-			next(err);
-			return;
-		}
-
-		//Transform to ogg
-		//let oldFileName = files.sounds[0].name; // = "machin.mp3"
-		let tempFileName = files.sounds.path; // = "sounds/test/upload_fdgksdjfglkdjsfhglsdfg"
-		let newFileName = slugify(fields.title);
-		let soundtitle = fields.title;
-
-		let args = [
-			'-y', 
-			'-i', tempFileName,
-			'-c:a', 'libopus', 
-			'-b:a', '96k', 
-			'-f', 'ogg', process.env.SOUNDS_FOLDER+newFileName+'.ogg'
-		];
-		
-		//Copy as .ogg and remove temp file
-		let proc = spawn(cmd, args);
-		proc.on('exit', async (err) => {
-
-			if(err){
-				console.log('Ogg Transformation Error !');
-			}
-			else{
-				await fs.unlinkSync(tempFileName);
-
-				let sound = { 
-					id: newFileName,
-					description: soundtitle, 
-					extension: '.ogg',
-					volume: 10 
-				};
-				
-				let data = JSON.stringify(sound);
-				fs.writeFileSync(process.env.SOUNDS_FOLDER+newFileName+'.json', data);
-		
-				client.sounds.set(sound.id, sound);
-
-				res.status(200).send();
-			}
-		})
-	});
-});
 
 //-------------------------------------------------------------------
 
@@ -368,30 +304,3 @@ io.on('connection', (socket) => {
 		console.log(' - User disconnected');
 	});
 });
-
-
-
-
-//Function to normalize name for the file
-function slugify (str) {
-    var map = {
-        '_' : ' |-',
-        'a' : 'ä|á|à|ã|â|Ä|À|Á|Ã|Â',
-        'e' : 'ë|é|è|ê|Ë|É|È|Ê',
-        'i' : 'ï|í|ì|î|Ï|Í|Ì|Î',
-        'o' : 'ö|ó|ò|ô|õ|Ö|Ó|Ò|Ô|Õ',
-        'u' : 'ú|ù|û|ü|Ú|Ù|Û|Ü',
-        'c' : 'ç|Ç',
-        'n' : 'ñ|Ñ'
-    };
-    
-    str = str.toLowerCase();
-    
-    for (var pattern in map) {
-        str = str.replace(new RegExp(map[pattern], 'g'), pattern);
-	};
-	
-	var regExpr = /[^a-z0-9_]/g;
-	str = str.replace(regExpr, '');
-    return str;
-};
