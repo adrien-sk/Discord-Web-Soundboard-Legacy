@@ -360,14 +360,7 @@ io.on('connection', (socket) => {
 
 	socket.on('userSettingsUpdated', async () => {
 		var test = await getAllSounds();
-		//test.then(() => {
-			console.log(client.sounds.size+' - - - - - emit io');
-			io.emit('updateSounds', {sounds: client.sounds});
-		//}).catch((err) => {
-		//	console.log(err);
-		//});
-		
-		
+		io.emit('updateSounds', {sounds: client.sounds});
 	});
 
 	//Receive "disconnect" event from client : Someone closed the webapp

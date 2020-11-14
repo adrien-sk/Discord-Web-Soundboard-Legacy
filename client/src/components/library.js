@@ -17,11 +17,14 @@ const Library = ({ librarySounds, playSound, volumeChangeHandler, removeUserSoun
 
 	return(
 		<div className={"library"+hoverClass} ref={drop}>
-			{
-				librarySounds.map(sound => {
-					return <LibrarySound key={sound.id} sound={sound} playSound={playSound} volumeChangeHandler={volumeChangeHandler}/>
-				})
-			}
+			<h2>Library</h2>
+			<div className="sounds">
+				{
+					librarySounds.map(sound => {
+						return <LibrarySound key={sound.id} sound={sound} playSound={playSound} volumeChangeHandler={volumeChangeHandler}/>
+					})
+				}
+			</div>
 		</div>
 	);
 }

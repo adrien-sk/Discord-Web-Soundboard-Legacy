@@ -28,13 +28,11 @@ router.put('/updateusersound', async (req, res) => {
 // TODO : Into post
 router.put('/addusersound', async (req, res) => {
 	const dbResults = await dbRequests.addUserSound(req.user.id, req.body.userSoundId, req.body.newCategory);
-	console.log('---------------------------------- Add sound is back');
 	res.json(dbResults);
 });
 
 router.delete('/deleteusersound', async (req, res) => {
 	const dbResults = await dbRequests.deleteUserSound(req.body.userSoundId);
-	console.log('---------------------------------- Delete sound is back');
 	res.json(dbResults);
 });
 

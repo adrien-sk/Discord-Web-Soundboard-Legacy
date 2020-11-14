@@ -241,23 +241,30 @@ class Dashboard extends React.Component{
 
 		return (
 			<main>
-				{ this.state.isLoaded && <UserBoard userSounds={this.state.userSounds} onUpdateSound={this.updateUserSoundHandler} playSound={this.playSound} onAddUserCategory={this.onAddUserCategory} onUpdateCategoryName={this.updateCategoryNameHandler} onDeleteCategory={this.deleteCategoryHandler} /> }
-				<div className="volume-wrapper">
-					<i className="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
-				</div>
-				{<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>}
-				<div id="buttons" className="hide-volume">
+				<div className="left-panel">
+					<header>
+						<h1>Discord Web Soundboard</h1>
+						<div className="logo"><i className="fab fa-discord"></i></div>
+					</header>
 					<Library librarySounds={this.state.sounds} playSound={this.playSound} removeUserSoundHandler={this.removeUserSoundHandler} volumeChangeHandler={this.onVolumeChangeHandler} />
-					{/* {buttons} */}
 				</div>
-				<div id="upload-form">
-					<input required type="text" name="title" onChange={this.onFileTitleChangeHandler} value={fileTitle} className="form-control" placeholder="Sound title" />
-					<div id="files-container">
-						<input required type="file" name="file" className="files" onChange={this.onFileChangeHandler}/>
-						<p>{file}</p>
-					</div>
-					<a href="#" onClick={this.uploadFile} className="btn">Upload</a>
-					<p id="form-error">{formErrorText}</p>
+				<div id='page-container'>
+					{ this.state.isLoaded && <UserBoard userSounds={this.state.userSounds} onUpdateSound={this.updateUserSoundHandler} playSound={this.playSound} onAddUserCategory={this.onAddUserCategory} onUpdateCategoryName={this.updateCategoryNameHandler} onDeleteCategory={this.deleteCategoryHandler} /> }
+					{/* <div className="volume-wrapper">
+						<i className="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
+					</div> */}
+					{/* {<a href="#" className="stop-sound" onClick={(event) => this.stopAllSound(event)}>Stop Sound</a>} */}
+					{/* <div id="upload-form">
+						<input required type="text" name="title" onChange={this.onFileTitleChangeHandler} value={fileTitle} className="form-control" placeholder="Sound title" />
+						<div id="files-container">
+							<input required type="file" name="file" className="files" onChange={this.onFileChangeHandler}/>
+							<p>{file}</p>
+						</div>
+						<a href="#" onClick={this.uploadFile} className="btn">Upload</a>
+						<p id="form-error">{formErrorText}</p>
+					</div> */}
+					
+					<a href="https://github.com/Nadrielle/Discord-Web-Soundboard" target="_blank"><span className="git-link"><i className="fab fa-github"></i></span></a>
 				</div>
 			</main>
 		);

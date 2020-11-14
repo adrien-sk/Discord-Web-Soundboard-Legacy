@@ -31,7 +31,7 @@ const UserCategory = ({ category, onUpdateSound, playSound, onUpdateCategoryName
 					})
 				}
 			</div>
-			<div className="delete-category"><i className="far fa-trash-alt" onClick={() => onDeleteCategory(category.id)}></i></div>
+			<div className="delete-category" onClick={() => onDeleteCategory(category.id)}><i className="far fa-trash-alt"></i></div>
 		</div>
 	);
 }

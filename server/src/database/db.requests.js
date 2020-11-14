@@ -51,7 +51,8 @@ const requests = {
 	getUserSoundsObject: async (id) => {
 		const categoriesResult = await dbConnection(tableNames.categories).select('id', 'name').where({
 			user_id: id
-		});
+		})
+		.orderBy('id');
 
 		for(let i=0; i < categoriesResult.length; i++){
 			let sounds = [];

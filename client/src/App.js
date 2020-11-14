@@ -49,15 +49,11 @@ class App extends React.Component{
 	render(){
 		return(
 			<DndProvider backend={HTML5Backend}>
-				<div id='page-container'>
-					<Header />
-						{this.state.authenticated ? (
-							<Dashboard socket={this.state.socket} userId={this.state.userId} />
-						) : (
-							<Login />
-						)}
-					<Footer />
-				</div>
+				{this.state.authenticated ? (
+					<Dashboard socket={this.state.socket} userId={this.state.userId} />
+				) : (
+					<Login />
+				)}
 			</DndProvider>
 		);
 	}

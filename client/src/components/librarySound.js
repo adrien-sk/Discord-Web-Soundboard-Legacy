@@ -15,7 +15,7 @@ const LibrarySound = ({ sound, playSound, volumeChangeHandler }) => {
 	return(
 		<div className="library-sound sound-wrapper" ref={drag}>
 			<button className="sound btn" onClick={() => playSound(sound)}>{sound.display_name}</button>
-			<input data-name={sound.file_name} type="range" min="0" max="40" defaultValue='10' className="slider" onChange={volumeChangeHandler} />
+			{/* <input data-name={sound.file_name} type="range" min="0" max="40" defaultValue='10' className="slider" onChange={volumeChangeHandler} /> */}
 		</div>
 	);
 }

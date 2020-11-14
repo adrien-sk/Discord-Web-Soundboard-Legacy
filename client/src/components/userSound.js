@@ -14,9 +14,7 @@ const UserSound = ({ sound, playSound }) => {
 	//console.log(sound);
 
 	return(
-		<div className="user-sound sound-wrapper" ref={drag}>
-			<button className="sound btn" onClick={() => playSound(sound)}>{sound.display_name}</button>
-		</div>
+		<button className="sound btn" ref={drag} onClick={() => playSound(sound)}>{sound.display_name}</button>
 	);
 }
 

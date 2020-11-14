@@ -10,7 +10,7 @@ const UserBoard = ({ userSounds, onUpdateSound, playSound, onAddUserCategory, on
 					return <UserCategory key={category.id} category={category} onUpdateSound={onUpdateSound} playSound={playSound} onUpdateCategoryName={onUpdateCategoryName} onDeleteCategory={onDeleteCategory} />
 				})
 			}
-			<div className="new-category"><i className="fas fa-plus" onClick={onAddUserCategory}></i></div>
+			<div className="new-category" onClick={onAddUserCategory}><i className="fas fa-plus"></i></div>
 		</div>
 	);
 }

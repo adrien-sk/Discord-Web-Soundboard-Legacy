@@ -1,4 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600&display=swap');
 @import "reset";
+
+/*
+*	Colors
+*/
+
+$body-background-color: linear-gradient(#1e1e2f,#1e1e24);
+//$header-background-color:#192D3E;
+$library-background-color: #27293d;
+$box-background-color: #2b3553;
+$box-text-color: rgb(210,210,210);
+$button-background: #33c2f8;
+$blue1: #1d8cf8;
+$blue2: #419ef9;
 
 :root{
 	--background-color1: rgb(47,49,54);
@@ -12,38 +26,175 @@
 }
 
 html{
-	background-color: var(--background-color2);
-	color: white;
-	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+	background: $body-background-color;
+	color: $box-text-color;
+	font-family: 'Poppins', sans-serif;
 }
 
+button.btn{
+	background: $blue1;
+	padding: 10px 16px;
+	margin: 8px 15px;
+	font-size: 16px;
+	width: 300px;
+	transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 400;
+	border-radius: 4px;
+	border: none;
+	color: white;//rgb(30,30,30);
+}
 
-#page-container{
+main{
 	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: center;
-	min-height: 100vh;
-}
+	flex-direction: row;
 
-header{
-	background-color: var(--background-color1);
-	width: 100%;
-	text-align: center;
-	padding: 30px 0;
-}
+	.left-panel{
+		width: 350px;
+		background: $box-background-color;
+		box-shadow: 0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12);
 
-header .logo{
-	font-size: 5rem;
-}
+		header{
+			display: flex;
+			justify-content: center;
+			padding: 50px 0 90px;
+			position: relative;
 
-header h1{
-	font-size: 2rem;
+			h1{
+				font-size: 20px;
+				font-weight: 300;
+			}
+
+			.logo{
+				position: absolute;
+				bottom: -50px;
+				background: $library-background-color;
+				height: 100px;
+				width: 100px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				border-radius: 100%;
+
+				i{
+					font-size: 48px;
+				}
+			}
+		}
+
+		.library{
+			padding-top: 50px;
+			background: $library-background-color;
+
+			h2{
+				text-align: center;
+				padding: 20px 0px 10px;
+				border-bottom: 1px solid rgba(255,255,255,0.2);
+				margin: 0 60px 15px;
+			}
+
+			.sounds{
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+		}
+	}
+
+	#page-container{
+		flex-grow: 1;
+		padding: 30px;
+
+		.user-categories{
+
+
+			.user-category{
+				background: $box-background-color;
+				margin-bottom: 30px;
+				box-shadow: 0 1px 20px 0 rgba(0,0,0,.1);
+				padding: 0 15px 15px;
+				margin-right: 10px; 
+				border-radius: 5px;
+				position: relative;
+
+				input{
+					font-size: 27px;
+					font-weight: 200;
+					font-family: 'Poppins', sans-serif;
+					color: white;
+					background: none;
+					border: none;
+					margin: 15px;
+				}
+
+				.user-sounds{
+					display: flex;
+					flex-wrap: wrap;
+					justify-content: center;
+					min-height: 60px;
+				}
+
+				.delete-category{
+					position: absolute;
+					right: -25px;
+					top: -25px;
+					background: #27293d;
+					height: 60px;
+					width: 60px;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					border-radius: 100%;
+					cursor: pointer;
+	
+					i{
+						font-size: 24px;
+					}
+				}
+			}
+
+			.new-category{
+				background: #27293d;
+				height: 60px;
+				width: 60px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				border-radius: 100%;
+				cursor: pointer;
+
+				i{
+					font-size: 24px;
+				}
+			}
+		}
+	}
+
+	.git-link{
+		background-color: $button-background;
+		width: 120px;
+		height: 120px;
+		position: fixed;
+		bottom: -60px;
+		right: -60px;
+		transform: rotate(45deg);
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+
+		i{
+			color: white;
+			transform: rotate(90deg);
+			font-size: 36px
+		}
+	}
 }
+/* ----------------------------------------------- */
+
+
 
 /*---------------*/
-
+/*
 .user-categories{
 	.user-category{
 		position: relative;
@@ -93,45 +244,11 @@ header h1{
 	&.hover{
 		background: red;
 	}
-}
+}*/
 
 /*----------------*/
 
-main{
-	width: 100%;
-	margin: 50px auto;
-	max-width: 90%;
-	flex: 1;
-}
-
-.volume-wrapper{
-	text-align: center;
-	margin-bottom: 15px;
-}
-
-.volume-wrapper i{
-	cursor: pointer;
-	opacity: .3;
-	transition: all 0.1s ease;
-}
-
-.volume-wrapper i:hover{
-	opacity: .9;
-}
-
-.stop-sound{
-	background-color: var(--red-color);
-	color: var(--white);
-	padding: 15px;
-	margin: auto auto 25px;
-	border-radius: 3px;
-	text-decoration: none;
-	position: relative;
-	width: 280px;
-	text-align: center;
-	display: block;
-}
-
+/*
 .stop-sound:active{
 	background-color: var(--red-color);
 	padding: 10px 15px 15px;
@@ -228,7 +345,7 @@ main{
 	max-width: 100%;
 	margin: auto;
 }
-
+*/
 #upload-form #files-container{
 	width: /*calc(*/100%;/* - 6px);*/
 	position: relative;
@@ -258,7 +375,7 @@ main{
 	outline: none;
 	opacity: 0;
 }
-
+/*
 .form-control{
 	background-color: var(--background-color1);
 	color: var(--white);
@@ -294,22 +411,4 @@ footer{
 	text-align: center;
 	padding: 30px 0;
 }
-
-footer a{
-	color: var(--green-color);
-	text-decoration: none;
-	display: block;
-	margin-top: 10px;
-}
-
-footer a:hover{
-	text-decoration: underline;
-}
-
-
-@media(max-width: 1199px){
-	main{
-		margin: 50px 0;
-		max-width: 99%;
-	}
-}
+*/
