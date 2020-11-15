@@ -79,7 +79,7 @@ class Dashboard extends React.Component{
 			}
 		}
 		else{
-			if(this.state.fileToUpload.name.indexOf('mp3') != -1 || this.state.fileToUpload.name.indexOf('ogg') != -1){
+			if(this.state.fileToUpload.name.indexOf('mp3') !== -1 || this.state.fileToUpload.name.indexOf('ogg') !== -1){
 				var formData = new FormData();
 				formData.set('title', this.state.fileTitleToUpload);
 				formData.append('sounds', this.state.fileToUpload);
@@ -222,7 +222,7 @@ class Dashboard extends React.Component{
 
 	render(){
 		const fileTitle = this.state.fileTitleToUpload;
-		const sounds = this.state.sounds;
+		//const sounds = this.state.sounds;
 		/*const buttons = Object.values(sounds).map((sound) => {
 			return(
 				this.renderButton(sound)
@@ -242,12 +242,12 @@ class Dashboard extends React.Component{
 					<div className="collapse-leftpanel" onClick={this.collapseLeftPanelHandler}><i className="fas fa-angle-right"></i><i className="fas fa-angle-left"></i></div>
 				</div>
 				<div id='page-container'>
-					<div className="stop-sound" onClick={(event) => this.stopAllSound(event)}><i class="fas fa-volume-mute"></i></div>
+					<div className="stop-sound" onClick={(event) => this.stopAllSound(event)}><i className="fas fa-volume-mute"></i></div>
 					{ this.state.isLoaded && <UserBoard userSounds={this.state.userSounds} onUpdateSound={this.updateUserSoundHandler} playSound={this.playSound} onAddUserCategory={this.onAddUserCategory} onUpdateCategoryName={this.updateCategoryNameHandler} onDeleteCategory={this.deleteCategoryHandler} /> }
 					{/* <div className="volume-wrapper">
 						<i className="fas fa-volume-up fa-2x" onClick={this.displayVolumes}></i>
 					</div> */}
-					<div id="upload-form" style="display: none;">
+					<div id="upload-form">
 						<input required type="text" name="title" onChange={this.onFileTitleChangeHandler} value={fileTitle} className="form-control" placeholder="Sound title" />
 						<div id="files-container">
 							<input required type="file" name="file" className="files" onChange={this.onFileChangeHandler}/>

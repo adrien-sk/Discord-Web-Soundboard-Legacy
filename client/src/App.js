@@ -1,8 +1,6 @@
 import React from 'react';
 import Login from './components/login';
 import Dashboard from './components/dashboard';
-import Header from './components/header';
-import Footer from './components/footer';
 import socketIOClient from 'socket.io-client';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
