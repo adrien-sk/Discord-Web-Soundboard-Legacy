@@ -30,7 +30,7 @@
     "ffmpeg-static": "^4.2.2",
     "formidable": "^1.2.2",
     "helmet": "^4.2.0",
-    "knex": "^0.21.12",
+    "knex": "^2.4.0",
     "nodemon": "^2.0.6",
     "objection": "^2.2.3",
     "passport": "^0.4.1",
