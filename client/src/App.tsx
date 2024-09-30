@@ -9,7 +9,22 @@ function App() {
     useEffect(() => {
         // Call /auth/isloggedin to check if user is logged in
         // Then setup isauthenticated data
-        //fetchData().then(response => setData(response));
+        fetch("http://localhost:8080/auth/isauthenticated", {
+			method: "GET",
+			credentials: "include",
+		})
+		.then(response => {
+            if(response.ok) {
+                setIsAuthenticated(true)
+            }
+            else{
+                throw new Error('failed to authenticate user');
+            }
+		})
+		.catch(error => {
+			console.log('Error')
+			console.log(error)
+		});
       }, []);
 
     return (

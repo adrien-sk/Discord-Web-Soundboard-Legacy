@@ -7,7 +7,7 @@ function Login() {
             {/* <img className="logo" src={reactLogo} alt="logo"/> */}
             <div className="login-box">
                 <h2>Login</h2>
-                <a href="http://localhost:5000/auth" className="btn">Authenticate with Discord</a>
+                <a href="http://localhost:8080/auth" className="btn">Authenticate with Discord</a>
             </div>
         </div>
     )
